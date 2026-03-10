@@ -1,0 +1,14 @@
+// création de l'utilisateur dans la base de donnée
+
+CREATE ROLE epic_user WITH
+  LOGIN
+  NOSUPERUSER
+  INHERIT
+  NOCREATEDB
+  NOCREATEROLE
+  NOREPLICATION
+  NOBYPASSRLS
+  PASSWORD 'user_epic';
+
+CREATE SCHEMA IF NOT EXISTS prod
+    AUTHORIZATION epic_user;
