@@ -1,4 +1,4 @@
-from private.parameter import parameter
+from sources.database import Base
 
 from decimal import Decimal
 
@@ -7,15 +7,13 @@ from typing import List, Optional
 from datetime import date, datetime
 
 from sqlalchemy.orm import (
-    DeclarativeBase,
     relationship,
-    sessionmaker,
     Mapped,
     mapped_column,
 )
 
 from sqlalchemy import (
-    Column,
+
     Integer,
     String,
     Date,
@@ -25,39 +23,44 @@ from sqlalchemy import (
     Text,
     ForeignKey,
     CheckConstraint,
-    create_engine,
-    MetaData,
+    UniqueConstraint,
 )
 
-engine = create_engine(
-    f'postgresql+psycopg2://epic_user:{parameter["password_db"]}@localhost:5432/epic_events',
-    echo=False
-)
 
-Session = sessionmaker(bind=engine)
-session = Session()
+class Department(Base):
+    __tablename__ = 'department'
 
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(50))
 
-class Base(DeclarativeBase):
-    metadata = MetaData(schema="dev")
+    users: Mapped[List["User"]] = relationship(back_populates="department")
+
+    __table_args__ = (
+        UniqueConstraint("name", name="unique_department_name"),
+        CheckConstraint(
+            "name IN ('Sales', 'Support', 'Management')",
+            name="check_name"
+        ),
+    )
 
 
 class User(Base):
     __tablename__ = 'user'
+
     id: Mapped[int] = mapped_column(primary_key=True)
     first_name: Mapped[str] = mapped_column(String(50))
     last_name: Mapped[str] = mapped_column(String(50))
-    department: Mapped[str] = mapped_column(String(50))
+    email: Mapped[str] = mapped_column(String(50))
+
+    department_id: Mapped[int] = mapped_column(ForeignKey("department.id"))
+    department: Mapped["Department"] = relationship(back_populates="users")
 
     clients: Mapped[List["Client"]] = relationship(back_populates="commercial")
 
-    contracts: Mapped[List["Contract"]] = relationship(back_populates="commercial")
+    events: Mapped[List["Event"]] = relationship(back_populates="support")
 
     __table_args__ = (
-        CheckConstraint(
-            "department IN ('Sales', 'Support', 'Management')",
-            name="check_department"
-        ),
+        UniqueConstraint("email", name="unique_email_user_name"),
     )
 
 
@@ -69,7 +72,9 @@ class Enterprise(Base):
 
     clients: Mapped[List["Client"]] = relationship(back_populates="enterprise")
 
-    events: Mapped[List["Event"]] = relationship(back_populates="support")
+    __table_args__ = (
+        UniqueConstraint("name", name="unique_enterprise_name"),
+    )
 
 
 class Client(Base):
@@ -88,13 +93,15 @@ class Client(Base):
 
     contracts: Mapped[List["Contract"]] = relationship(back_populates="client")
 
-    events: Mapped[List["Event"]] = relationship(back_populates="client")
-
     enterprise_id: Mapped[int] = mapped_column(ForeignKey("enterprise.id"))
     enterprise: Mapped["Enterprise"] = relationship(back_populates="clients")
 
     commercial_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
     commercial: Mapped["User"] = relationship(back_populates="clients")
+
+    __table_args__ = (
+        UniqueConstraint("email", name="unique_email_client_name"),
+    )
 
 
 class Contract(Base):
@@ -109,9 +116,6 @@ class Contract(Base):
     client_id: Mapped[int] = mapped_column(ForeignKey("client.id"))
     client: Mapped["Client"] = relationship(back_populates="contracts")
 
-    commercial_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    commercial: Mapped["User"] = relationship(back_populates="contracts")
-
     event: Mapped[Optional["Event"]] = relationship(back_populates="contract")
 
 
@@ -119,6 +123,7 @@ class Event(Base):
     __tablename__ = 'event'
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(150))
     type_event: Mapped[str] = mapped_column(String(50))
     date_start: Mapped[date] = mapped_column(Date)
     date_end: Mapped[date] = mapped_column(Date)
@@ -128,11 +133,8 @@ class Event(Base):
     contract_id: Mapped[int] = mapped_column(ForeignKey("contract.id"), unique=True)
     contract: Mapped["Contract"] = relationship(back_populates="event")
 
-    client_id: Mapped[int] = mapped_column(ForeignKey("client.id"))
-    client: Mapped["Client"] = relationship(back_populates="events")
-
-    support_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    support: Mapped["User"] = relationship(back_populates="events")
+    support_id: Mapped[Optional[int]] = mapped_column(ForeignKey("user.id"), nullable=True)
+    support: Mapped[Optional["User"]] = relationship(back_populates="events")
 
     location_id: Mapped[int] = mapped_column(ForeignKey("location.id"))
     location: Mapped["Location"] = relationship(back_populates="events")
@@ -156,6 +158,3 @@ class Location(Base):
     country: Mapped[str] = mapped_column(String(50))
 
     events: Mapped[List["Event"]] = relationship(back_populates="location")
-
-
-Base.metadata.create_all(engine)
