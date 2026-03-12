@@ -26,7 +26,26 @@ from sqlalchemy import (
     ForeignKey,
     CheckConstraint,
     UniqueConstraint,
+    Column,
+    Table,
 )
+
+departement_permissions = Table(
+    "departement_permission",
+    Base.metadata,
+    Column("department_id", ForeignKey("department.id"), primary_key=True),
+    Column("permission_id", ForeignKey("permission.id"), primary_key=True),
+)
+
+class Permission(Base):
+    __tablename__ = 'permission'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(50))
+
+    departments: Mapped[list["Department"]] = relationship(
+        secondary=departement_permissions, back_populates="permissions"
+    )
 
 
 class Department(Base):
@@ -37,10 +56,14 @@ class Department(Base):
 
     users: Mapped[List["User"]] = relationship(back_populates="department")
 
+    permissions: Mapped[list["Permission"]] = relationship(
+        secondary=departement_permissions, back_populates="departments"
+    )
+
     __table_args__ = (
         UniqueConstraint("name", name="unique_department_name"),
         CheckConstraint(
-            "name IN ('Sales', 'Support', 'Management')",
+            "name IN ('Sales', 'Support', 'Management', 'Admin')",
             name="check_name"
         ),
     )

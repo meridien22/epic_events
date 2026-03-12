@@ -6,3 +6,6 @@ class UserView:
 
     def display_error(self, message):
         click.echo(click.style(f"Erreur : {message}", fg="red"))
+
+    def display_info(self, message):
+        click.echo(click.style(f"{message}", fg="yellow"))

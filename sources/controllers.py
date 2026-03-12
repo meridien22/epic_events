@@ -1,11 +1,17 @@
-from sources.models import User, Department
+from sources.models import User, Department, Permission
 from sources.database import SessionLocal
 from sources.setup_db import init_db
 from sources.views import UserView
 from sqlalchemy.exc import IntegrityError
+from sources.validators import Validators
 import click
 
+init_db()
+
 view = UserView()
+
+read_perm = Permission(name="READ_CLIENTS")
+write_perm = Permission(name="WRITE_CLIENTS")
 
 @click.group()
 def cli():
@@ -43,19 +49,17 @@ def add_department(name):
     help="Mot de passe sécurisé"
 )
 def add_user(first_name, last_name, email, password):
-    if len(first_name) > 50 or len(last_name) > 50:
-        raise click.BadParameter("Le nom et le prénom ne doivent pas dépasser 50 caractères.")
-    if "@" not in email or "." not in email:
-        raise click.BadParameter("Le format de l'email est invalide.")
+    Validators.StringLen(first_name,"first_name",0, 50)
+    Validators.StringLen(first_name,"last_name",0, 50)
+    Validators.email(email)
     
     with SessionLocal() as session:
         departments = session.query(Department).all()
-        departments = {d.name: d.id for d in departments}
-        
-        choice = ", ".join([f"{v} ({k})" for k, v in departments.items()])
+        departments = {str(d.id): d.name for d in departments}
+        menu_choice = "\n".join([f" [{k}] {v}" for k, v in departments.items()])
         department_id = click.prompt(
-            "Veuillez choisir un département",
-            type=click.Choice(choice)
+            f"Départements disponibles :\n{menu_choice}\nEntrez le code du département",
+            type=click.Choice(list(departments.keys()))
         )
 
         try:
