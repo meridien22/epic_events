@@ -6,6 +6,8 @@ from typing import List, Optional
 
 from datetime import date, datetime
 
+from passlib.hash import argon2
+
 from sqlalchemy.orm import (
     relationship,
     Mapped,
@@ -51,6 +53,7 @@ class User(Base):
     first_name: Mapped[str] = mapped_column(String(50))
     last_name: Mapped[str] = mapped_column(String(50))
     email: Mapped[str] = mapped_column(String(50))
+    password: Mapped[str] = mapped_column(String(255))
 
     department_id: Mapped[int] = mapped_column(ForeignKey("department.id"))
     department: Mapped["Department"] = relationship(back_populates="users")
@@ -62,6 +65,15 @@ class User(Base):
     __table_args__ = (
         UniqueConstraint("email", name="unique_email_user_name"),
     )
+
+    def set_password(self, password):
+            self.password = argon2.hash(password)
+
+    def check_password(self, password):
+            try:
+                return argon2.verify(password, self.password)
+            except Exception:
+                return False
 
 
 class Enterprise(Base):
