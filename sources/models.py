@@ -69,6 +69,17 @@ class Department(Base):
     )
 
 
+class Session(Base):
+    __tablename__ = "session"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    refresh_token: Mapped[str] = mapped_column(String(50), unique=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), unique=True)
+    user: Mapped["User"] = relationship(back_populates="session")
+
+
 class User(Base):
     __tablename__ = 'user'
 
@@ -84,6 +95,8 @@ class User(Base):
     clients: Mapped[List["Client"]] = relationship(back_populates="commercial")
 
     events: Mapped[List["Event"]] = relationship(back_populates="support")
+
+    session: Mapped[List["Session"]] = relationship(back_populates="user")
 
     __table_args__ = (
         UniqueConstraint("email", name="unique_email_user_name"),

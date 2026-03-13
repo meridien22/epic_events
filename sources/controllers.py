@@ -5,6 +5,7 @@ from sources.views import UserView
 from sqlalchemy.exc import IntegrityError
 from sources.validators import Validators
 import click
+from sources.auth import generate_token_from_email
 
 init_db()
 
@@ -49,6 +50,7 @@ def add_department(name):
     help="Mot de passe sécurisé"
 )
 def add_user(first_name, last_name, email, password):
+    """Ajouter un utilisateur."""
     Validators.StringLen(first_name,"first_name",0, 50)
     Validators.StringLen(first_name,"last_name",0, 50)
     Validators.email(email)
@@ -79,3 +81,13 @@ def add_user(first_name, last_name, email, password):
             session.rollback()
             view.display_error("Impossible de créer cet utilisateur")
 
+@cli.command()
+@click.option('--email', prompt=True, hide_input=True, help="Email", default='oli@oli.fr')
+@click.option('--password', prompt=True, hide_input=True, help="Mot de passe")
+def login(email, password):
+    """Se connecter."""
+    result = generate_token_from_email(email, password)
+    if result == "Error":
+        view.display_error("Email ou mot de passe incorrecte")
+    else:
+        view.display_success(f"Connexion réussie.")

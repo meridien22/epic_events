@@ -1,3 +1,4 @@
 private/
 .venv/
 script_test.py
+.env
