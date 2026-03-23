@@ -1,4 +1,4 @@
-from sources.database import Base
+from sources.database.postgres import Base
 
 from decimal import Decimal
 

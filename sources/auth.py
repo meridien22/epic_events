@@ -1,4 +1,4 @@
-from sources.database import SessionLocal
+from sources.database.postgres import SessionLocal
 from cryptography.hazmat.primitives import serialization
 from private.parameter import parameter
 from sources.models import User
@@ -26,18 +26,16 @@ def get_public_key():
     public_key = open(parameter["ssh_public_key_file"], 'r').read()
     return public_key.encode()
 
-
 def get_public_key_ssh():
     return serialization.load_ssh_public_key(
          get_public_key()
     )
 
-def generate_token_from_id(id):
+def generate_token_from_id(id_user):
     with SessionLocal() as session:
-        user = session.query(User).filter_by(id=id).first()
+        user = session.query(User).filter_by(id=id_user).first()
         if not user :
             return "Error"
-
     generate_token(id)
 
 def generate_token_from_email(email, password):
@@ -45,31 +43,32 @@ def generate_token_from_email(email, password):
         user = session.query(User).filter_by(email=email).first()
         if not user or not user.check_password(password):
             return "Error"
-
         generate_token(user.id)
 
 def generate_token(id_user):
-    now = datetime.now(timezone.utc)
-    
-    access_payload = {
-        "sub": id_user,
-        "exp": now + timedelta(minutes=15),
-        "type": "access",
-        "department": user.department.id
-    }
-    
-    refresh_payload = {
-        "sub": id_user,
-        "exp": now + timedelta(days=7),
-        "type": "refresh"
-    }
+    with SessionLocal() as session:
+        now = datetime.now(timezone.utc)
+        user = session.query(User).filter_by(id=id_user).first()
 
-    access_token = jwt.encode(access_payload, key=get_private_key_ssh(), algorithm='RS256')
-    refresh_token = jwt.encode(refresh_payload, key=get_private_key_ssh(), algorithm='RS256')
+        access_payload = {
+            "sub": id_user,
+            "exp": now + timedelta(minutes=15),
+            "type": "access",
+            "department": user.department.id
+        }
+        
+        refresh_payload = {
+            "sub": id_user,
+            "exp": now + timedelta(days=7),
+            "type": "refresh"
+        }
 
-    with open(".env", "w") as f:
-        f.write(f"EPIC_EVENTS_ACCESS_TOKEN={access_token}\n")
-        f.write(f"EPIC_EVENTS_REFRESH_TOKEN={refresh_token}\n")
+        access_token = jwt.encode(access_payload, key=get_private_key_ssh(), algorithm='RS256')
+        refresh_token = jwt.encode(refresh_payload, key=get_private_key_ssh(), algorithm='RS256')
+
+        with open(".env", "w") as f:
+            f.write(f"EPIC_EVENTS_ACCESS_TOKEN={access_token}\n")
+            f.write(f"EPIC_EVENTS_REFRESH_TOKEN={refresh_token}\n")
 
 def refresh(refresh_token):
     try:

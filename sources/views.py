@@ -1,11 +1,15 @@
 import click
 
 class UserView:
-    def display_success(self, message):
+
+    @staticmethod
+    def display_success(message):
         click.echo(click.style(f"{message}", fg="green"))
 
-    def display_error(self, message):
+    @staticmethod
+    def display_error(message):
         click.echo(click.style(f"Erreur : {message}", fg="red"))
 
-    def display_info(self, message):
+    @staticmethod
+    def display_info(message):
         click.echo(click.style(f"{message}", fg="yellow"))
