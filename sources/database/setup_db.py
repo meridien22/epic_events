@@ -58,6 +58,7 @@ def init_db():
 
         department = session.query(Department).filter_by(name='Admin').first()
         permissions=[
+            "CREATE_DEPARTMENT"
         ]
         for permission_name in permissions:
             permission = Permission(name=permission_name)

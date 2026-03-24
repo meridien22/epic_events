@@ -6,7 +6,7 @@ from sources.views import UserView
 from sources.controllers.auth import generate_token_from_email_password
 
 @click.command()
-@click.option('--email', prompt=True, hide_input=True, help="Email", default='oli@oli.fr')
+@click.option('--email', prompt=True, hide_input=False, help="Email", default='oli@oli.fr')
 @click.option('--password', prompt=True, hide_input=True, help="Mot de passe")
 def login(email, password):
     """Se connecter."""
