@@ -129,7 +129,11 @@ def login_required(f):
         if not is_valid_tokens_env() or _token.access_token is None or _token.refresh_token is None:
             UserView.display_error("Erreur d'authentification.")
             raise click.Abort()
-        payload = get_payload(_token.access_token)
+        else:
+            # si le token est valide, on récupère le user et le département
+            payload = get_payload(_token.access_token)
+            _token.user_id = payload.get('sub')
+            _token.department_id = payload.get('department')
         return f(*args, **kwargs)
     return wrapper
 

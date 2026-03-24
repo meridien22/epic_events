@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from sources.controllers.auth import login_required, permission_required
 
 @click.command()
-@click.argument('name')
+@click.argument('name', type=click.STRING)
 @login_required
 @permission_required("CREATE_DEPARTMENT")
 def add_department(name):
