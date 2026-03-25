@@ -1,9 +1,9 @@
 import click
 from sources.models import Enterprise
-from sources.controllers.auth import login_required, permission_required
+from sources.controller.auth_controller import login_required, permission_required
 from sqlalchemy import select
-from sources.database.postgres import SessionLocal
-from sources.views import UserView
+from sources.dao.base_dao import SessionLocal
+from sources.view.views import UserView
 from sqlalchemy.exc import IntegrityError
 
 @click.command()

@@ -1,5 +1,5 @@
 import click
-from sources.views import UserView
+from sources.view.views import UserView
 
 view = UserView()
 

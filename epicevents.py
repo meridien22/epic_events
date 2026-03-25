@@ -1,4 +1,4 @@
-from sources.controller import cli
+from sources.main_controller import cli
 import os
 
 if __name__ == "__main__":

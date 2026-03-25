@@ -1,14 +1,15 @@
 import click
 from sources.models import Client
-from sources.controllers.auth import login_required, permission_required
+from sources.controller.auth_controller import login_required, permission_required
 from sqlalchemy import select
-from sources.database.postgres import SessionLocal
-from sources.views import UserView
+from sources.dao.base_dao import SessionLocal
+from sources.view.views import UserView
 
 @click.command()
 @login_required
 @permission_required("SELECT_CLIENT")
 def list_client():
+    """Lister les clients."""
     with SessionLocal() as session:
         query = select(Client)
         clients = session.execute(query).scalars().all()

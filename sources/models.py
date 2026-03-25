@@ -1,4 +1,4 @@
-from sources.database.postgres import Base
+from sources.dao.base_dao import Base
 
 from decimal import Decimal
 

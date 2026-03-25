@@ -1,10 +1,11 @@
-from sources.database.postgres import SessionLocal
+from sources.dao.base_dao import SessionLocal
+from sources.dao import DAO
 from cryptography.hazmat.primitives import serialization
 from private.parameter import parameter
 from sources.models import User, Permission, Department, Event
 from datetime import datetime, timedelta, timezone
 import jwt
-from sources.views import UserView
+from sources.view.views import UserView
 from functools import wraps
 import click
 from decouple import config
@@ -42,7 +43,8 @@ def get_public_key_ssh():
 
 def generate_token_from_email_password(email, password):
     with SessionLocal() as session:
-        user = session.query(User).filter_by(email=email).first()
+        dao = DAO(session)
+        user = dao.user.get_by_mail(email)
         if not user or not user.check_password(password):
             return "Error"
         generate_token(user.id)
@@ -50,7 +52,8 @@ def generate_token_from_email_password(email, password):
 def generate_token(id_user):
     with SessionLocal() as session:
         now = datetime.now(timezone.utc)
-        user = session.query(User).filter_by(id=id_user).first()
+        dao = DAO(session)
+        user = dao.user.get_by_id(id_user)
 
         access_payload = {
             "sub": str(id_user),
@@ -90,12 +93,11 @@ def is_valid_token(token, type):
         # on vérifie le type du token pour éviter d'utiliser un refresh à la place d'un access
         if not payload.get('type') == type:
             return False
-        # on vérifie aussi que l'id_user du payload existe encore dans la DB
-        user_id = payload.get('sub')
-        query = select(exists().where(User.id == user_id))
         with SessionLocal() as session:
-            result = session.execute(query).scalar()
-            if not result:
+            # on vérifie aussi que l'id_user du payload existe encore dans la DB
+            dao = DAO(session)
+            user = dao.user.get_by_id(payload.get('sub'))
+            if not user:
                 return False
     except jwt.ExpiredSignatureError:
         return False
@@ -143,12 +145,8 @@ def permission_required(permission):
         @wraps(f)
         def wrapper(*args, **kwargs):
             with SessionLocal() as session:
-                query = (
-                    select(Permission.name)
-                    .join(Permission.departments)
-                    .where(Department.id == _token.department_id)
-                )
-                permissions = session.execute(query).scalars().all()
+                dao = DAO(session)
+                permissions = dao.departement.get_permission(_token.department_id)
                 if permission not in permissions:
                     UserView.display_error("Opération non autorisée.")
                     raise click.Abort()

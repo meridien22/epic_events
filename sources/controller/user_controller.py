@@ -1,9 +1,9 @@
 import click
 from sources.validators import Validators
-from sources.database.postgres import SessionLocal
+from sources.dao.base_dao import SessionLocal
 from sources.models import User, Department
-from sources.views import UserView
-from sources.controllers.auth import generate_token_from_email_password
+from sources.view.views import UserView
+from sources.controller.auth_controller import generate_token_from_email_password
 
 @click.command()
 @click.option('--email', prompt=True, hide_input=False, help="Email")

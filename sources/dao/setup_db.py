@@ -1,12 +1,11 @@
-from sources.database.postgres import engine, Base
+from sources.dao.base_dao import engine, Base
 from sources.models import Department, Permission, User, Enterprise, Client, Contract, Location, Event
-from sources.database.postgres import SessionLocal
+from sources.dao.base_dao import SessionLocal
 from private.parameter import parameter
-from sqlalchemy import select, delete, text
+from sqlalchemy import select, text
 
 def init_db():
     Base.metadata.create_all(engine)
-
 
     with SessionLocal() as session:
         
