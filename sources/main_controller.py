@@ -7,7 +7,7 @@ from sources.controller.client_controller import list_client
 from sources.controller.enterprise_controller import add_enterprise
 
 
-init_db()
+# init_db()
 
 @click.group()
 def cli():

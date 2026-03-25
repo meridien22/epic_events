@@ -4,6 +4,7 @@ from sources.models import Department
 from sources.view.views import UserView
 from sqlalchemy.exc import IntegrityError
 from sources.controller.auth_controller import login_required, permission_required
+from sources.dao import DAO
 
 @click.command()
 @click.argument('name', type=click.STRING)
@@ -13,9 +14,9 @@ def add_department(name):
     """Ajouter un département."""
     with SessionLocal() as session:
         try:
+            dao = DAO(session)
+            dao.departement.create(name=name)
             # controller debut
-            new_dept = Department(name=name)
-            session.add(new_dept)
             session.commit()
             UserView.display_success(f"Département '{name}' créé.")
             # controller fin

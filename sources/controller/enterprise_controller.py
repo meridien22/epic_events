@@ -5,6 +5,7 @@ from sqlalchemy import select
 from sources.dao.base_dao import SessionLocal
 from sources.view.views import UserView
 from sqlalchemy.exc import IntegrityError
+from sources.dao import DAO
 
 @click.command()
 @click.argument('name', type=click.STRING)
@@ -14,8 +15,8 @@ def add_enterprise(name):
     """Ajouter une entreprise."""
     with SessionLocal() as session:
         try:
-            enterprise = Enterprise(name=name)
-            session.add(enterprise)
+            dao = DAO(session)
+            dao.enterprise.create(name=name)
             session.commit()
             UserView.display_success(f"Entreprise '{name}' créé.")
         except IntegrityError as e:

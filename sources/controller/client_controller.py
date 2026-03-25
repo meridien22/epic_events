@@ -4,6 +4,7 @@ from sources.controller.auth_controller import login_required, permission_requir
 from sqlalchemy import select
 from sources.dao.base_dao import SessionLocal
 from sources.view.views import UserView
+from sources.dao import DAO
 
 @click.command()
 @login_required
@@ -11,8 +12,8 @@ from sources.view.views import UserView
 def list_client():
     """Lister les clients."""
     with SessionLocal() as session:
-        query = select(Client)
-        clients = session.execute(query).scalars().all()
+        dao = DAO(session)
+        clients = dao.client.get_all()
         if not clients:
             UserView.display_info("Aucun client trouvé.")
             return

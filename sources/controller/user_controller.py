@@ -4,6 +4,7 @@ from sources.dao.base_dao import SessionLocal
 from sources.models import User, Department
 from sources.view.views import UserView
 from sources.controller.auth_controller import generate_token_from_email_password
+from sources.dao import DAO
 
 @click.command()
 @click.option('--email', prompt=True, hide_input=False, help="Email")
@@ -34,7 +35,8 @@ def add_user(first_name, last_name, email, password):
     Validators.email(email)
     
     with SessionLocal() as session:
-        departments = session.query(Department).all()
+        dao = DAO(session)
+        departments = dao.departement.get_all()
         departments = {str(d.id): d.name for d in departments}
         menu_choice = "\n".join([f" [{k}] {v}" for k, v in departments.items()])
         department_id = click.prompt(
@@ -43,14 +45,14 @@ def add_user(first_name, last_name, email, password):
         )
 
         try:
-            new_user = User(
+            dao = DAO(session)
+            dao.user.create(
                 first_name=first_name,
                 last_name=last_name,
                 email=email,
-                department_id=department_id
+                department_id=department_id,
+                password=password
             )
-            new_user.set_password(password)
-            
             session.add(new_user)
             session.commit()
             UserView.display_success(f"Utilisateur {first_name}  {last_name} créé.")

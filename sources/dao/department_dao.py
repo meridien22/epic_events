@@ -4,6 +4,10 @@ from sqlalchemy import select
 
 
 class DepartementDAO(BaseDAO):
+    def __init__(self, session):
+        super().__init__(session)
+        self.model = Department
+
     def get_permission(self, departement_id):
         query = (
             select(Permission.name)

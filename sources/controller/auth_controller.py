@@ -162,13 +162,12 @@ def owns_event(f):
             # click ajouter les paramètres de la commande comme des arguments de la fonction
             event_id = kwargs.get('event_id')
             # on vérifie si l'event existe dans la base
-            query = select(exists().where(Event.id == event_id))
-            result = session.execute(query).scalar()
-            if not result:
+            dao = DAO(session)
+            if not dao.event.exists(event_id):
                 UserView.display_error("Evénement inconnu dans la base")
                 raise click.Abort()
             # on vérifie que l'utilisateur est bien le support de l'event
-            event = session.query(Event).filter_by(id=event_id).first()
+            event = dao.event.get_by_id(event_id)
             if not event.support_id == _token.user_id:
                 UserView.display_error("Accès refusé : vous devez être le gestionnaire de l'événement pour pouvoir le modifier")
                 raise click.Abort()
