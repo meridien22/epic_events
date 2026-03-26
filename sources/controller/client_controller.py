@@ -1,23 +1,13 @@
-import click
-from sources.models import Client
-from sources.controller.auth_controller import login_required, permission_required
-from sqlalchemy import select
-from sources.dao.base_dao import SessionLocal
-from sources.view.views import UserView
 from sources.dao import DAO
+from exceptions import DatabaseError
+from sources.dao.base_dao import SessionLocal
 
-@click.command()
-@login_required
-@permission_required("SELECT_CLIENT")
-def list_client():
-    """Lister les clients."""
+def get_table_for_all_clients():
     with SessionLocal() as session:
         dao = DAO(session)
         clients = dao.client.get_all()
         if not clients:
-            UserView.display_info("Aucun client trouvé.")
-            return
-
+            raise DatabaseError("Aucun client trouvé.") 
         table_data = []
         for client in clients:
             list = []
@@ -32,6 +22,13 @@ def list_client():
             list.append(f"{client.commercial.first_name} {client.commercial.last_name}")
             table_data.append(list)
 
-        headers = ["ID", "Prénom", "Nom", "Email", "Téléphone", "Date création", "Date mise à jour", "Entreprise", "Commercial"]
-
-        UserView.display_table("Liste des clients", headers, table_data)
+        headers = [
+            "ID",
+            "Prénom",
+            "Nom",
+            "Email",
+            "Téléphone",
+            "Date création",
+            "Date mise à jour", "Entreprise", "Commercial"
+        ]
+        return headers, table_data

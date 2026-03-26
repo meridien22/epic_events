@@ -1,10 +1,10 @@
 from sources.dao.setup_db import init_db
 import click
-from sources.controller.department_controller import add_department
-from sources.controller.user_controller import login
-from sources.controller.user_controller import add_user
-from sources.controller.client_controller import list_client
-from sources.controller.enterprise_controller import add_enterprise
+from sources.command.department_command import add_department
+from sources.command.user_command import login
+from sources.command.user_command import add_user
+from sources.command.client_command import list_client
+from sources.command.enterprise_command import add_enterprise
 
 
 # init_db()

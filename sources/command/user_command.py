@@ -2,20 +2,21 @@ import click
 from sources.validators import Validators
 from sources.dao.base_dao import SessionLocal
 from sources.models import User, Department
-from sources.view.views import UserView
-from sources.controller.auth_controller import generate_token_from_email_password
+from sources.command.views import UserView
+from sources.controller.token_controller import generate_token_from_email_password
 from sources.dao import DAO
+from exceptions import AuthError
 
 @click.command()
 @click.option('--email', prompt=True, hide_input=False, help="Email")
 @click.option('--password', prompt=True, hide_input=True, help="Mot de passe")
 def login(email, password):
     """Se connecter."""
-    result = generate_token_from_email_password(email, password)
-    if result == "Error":
-        UserView.display_error("Email ou mot de passe incorrecte")
-    else:
+    try:
+        generate_token_from_email_password(email, password)
         UserView.display_success(f"Connexion réussie.")
+    except AuthError as e:
+        UserView.display_error(str(e))
 
 @click.command()
 @click.argument('first_name', type=click.STRING)

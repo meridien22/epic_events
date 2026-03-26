@@ -1,5 +1,5 @@
 import click
-from sources.view.views import UserView
+from sources.command.views import UserView
 
 view = UserView()
 
@@ -11,7 +11,7 @@ class Validators():
             message = f"Le nombre de caractère de {name} doit être compris entre {min} et {max}."
             view.display_info(message)
             click.get_current_context().exit()
-    
+
     @staticmethod
     def email(value):
         if "@" not in value or "." not in value:
