@@ -1,6 +1,6 @@
 from sources.dao.base_dao import SessionLocal
 from sources.dao import DAO
-from exceptions import AuthError, DatabaseError, FileError
+from sources.exceptions import AuthError, DatabaseError, FileError
 from datetime import datetime, timedelta, timezone
 import jwt
 from sources.controller.security_controller import get_private_key_ssh, get_public_key_ssh
@@ -39,7 +39,7 @@ class Token:
             
             refresh_payload = {
                 "sub": str(id_user),
-                "exp": now + timedelta(days=30),
+                "exp": now + timedelta(days=1),
                 "type": "refresh"
             }
 

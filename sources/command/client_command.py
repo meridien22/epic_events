@@ -1,8 +1,8 @@
 import click
-from sources.controller.token_controller import login_required, permission_required
-from sources.command.views import UserView
+from sources.controller.authorisation_controller import login_required, permission_required
+from sources.command.tool_command import UserView
 from sources.controller.client_controller import get_table_for_all_clients
-from exceptions import EpicEventsError
+from sources.exceptions import EpicEventsError
 
 @click.command()
 @login_required

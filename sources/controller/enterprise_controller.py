@@ -7,11 +7,11 @@ def add(name):
     with SessionLocal() as session:
         try:
             dao = DAO(session)
-            dao.departement.create(name=name)
+            dao.enterprise.create(name=name)
             session.commit()
         except IntegrityError as e:
             session.rollback()
-            raise DatabaseError("Département non autorisé ou déjà utilisé.")
+            raise DatabaseError("Entreprise non autorisé ou déjà utilisé.")
         except Exception as e:
             session.rollback()
-            raise DatabaseError("Une erreur inattendue est survenue.")
+            raise DatabaseError("Une erreur inattendue est survenue.") 

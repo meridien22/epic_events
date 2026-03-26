@@ -1,5 +1,5 @@
 from sources.dao import DAO
-from exceptions import DatabaseError
+from sources.exceptions import DatabaseError
 from sources.dao.base_dao import SessionLocal
 
 def get_table_for_all_clients():

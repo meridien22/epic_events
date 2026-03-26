@@ -7,7 +7,7 @@ from sources.command.client_command import list_client
 from sources.command.enterprise_command import add_enterprise
 
 
-# init_db()
+init_db()
 
 @click.group()
 def cli():

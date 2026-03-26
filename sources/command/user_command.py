@@ -1,11 +1,10 @@
 import click
-from sources.validators import Validators
-from sources.dao.base_dao import SessionLocal
-from sources.models import User, Department
-from sources.command.views import UserView
-from sources.controller.token_controller import generate_token_from_email_password
-from sources.dao import DAO
-from exceptions import AuthError
+from sources.controller.tool_controller import Tools
+from sources.command.tool_command import UserView
+from sources.controller.token_controller import Token
+from sources.exceptions import EpicEventsError
+from sources.controller.user_controller import get_departments, add
+from sources.controller.authorisation_controller import login_required, permission_required
 
 @click.command()
 @click.option('--email', prompt=True, hide_input=False, help="Email")
@@ -13,51 +12,39 @@ from exceptions import AuthError
 def login(email, password):
     """Se connecter."""
     try:
-        generate_token_from_email_password(email, password)
+        token = Token()
+        token.generate_token_from_email_password(email, password)
         UserView.display_success(f"Connexion réussie.")
-    except AuthError as e:
-        UserView.display_error(str(e))
-
+    except EpicEventsError as e:
+        error_type = e.__class__.__name__
+        UserView.display_error(f"[{error_type}] : {str(e)}")
+        
 @click.command()
 @click.argument('first_name', type=click.STRING)
 @click.argument('last_name', type=click.STRING)
-@click.option('--email', prompt=True, help="Email de l'utilisateur")
+@click.option('--email', help="Email de l'utilisateur")
 @click.option(
     '--password', 
-    prompt=True, 
     hide_input=True, 
-    confirmation_prompt=True,
     help="Mot de passe sécurisé"
 )
+@login_required
+@permission_required("CREATE_USER")
 def add_user(first_name, last_name, email, password):
     """Ajouter un utilisateur."""
-    Validators.StringLen(first_name,"first_name",0, 50)
-    Validators.StringLen(first_name,"last_name",0, 50)
-    Validators.email(email)
-    
-    with SessionLocal() as session:
-        dao = DAO(session)
-        departments = dao.departement.get_all()
-        departments = {str(d.id): d.name for d in departments}
-        menu_choice = "\n".join([f" [{k}] {v}" for k, v in departments.items()])
+    try:
+        if not email:
+            email = click.prompt("Email de l'utilisateur")
+        if not password:
+            password = click.prompt("Mot de passe", hide_input=True, confirmation_prompt=True)
+        departments = get_departments()
+        param_choice = Tools.get_choice_from_id_name(departments)
         department_id = click.prompt(
-            f"Départements disponibles :\n{menu_choice}\nEntrez le code du département",
-            type=click.Choice(list(departments.keys()))
+            f"Départements disponibles :\n{param_choice[1]}\nEntrez le code du département",
+            type=click.Choice(list(param_choice[0].keys()))
         )
-
-        try:
-            dao = DAO(session)
-            dao.user.create(
-                first_name=first_name,
-                last_name=last_name,
-                email=email,
-                department_id=department_id,
-                password=password
-            )
-            session.add(new_user)
-            session.commit()
-            UserView.display_success(f"Utilisateur {first_name}  {last_name} créé.")
-            
-        except Exception as e:
-            session.rollback()
-            UserView.display_error("Impossible de créer cet utilisateur")
+        add(first_name, last_name, email, password, department_id)
+        UserView.display_success(f"Utilisateur {first_name}  {last_name} créé.")
+    except EpicEventsError as e:
+        error_type = e.__class__.__name__
+        UserView.display_error(f"[{error_type}] : {str(e)}")

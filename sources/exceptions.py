@@ -13,3 +13,7 @@ class DatabaseError(EpicEventsError):
 class FileError(EpicEventsError):
     """Erreur lors d'une opération sur la base de données."""
     pass
+
+class FormError(EpicEventsError):
+    """Erreur lors d'une opération sur la base de données."""
+    pass
