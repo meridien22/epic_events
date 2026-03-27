@@ -31,8 +31,8 @@ class BaseDAO:
             return obj
     
     def delete(self, obj):
-            if obj:
-                self.session.delete(obj)
+        if obj:
+            self.session.delete(obj)
 
     def create(self, **data):
         new_obj = self.model(**data)
@@ -42,7 +42,4 @@ class BaseDAO:
     def exists(self, obj_id):
         query = select(exists().where(self.model.id == obj_id))
         result = self.session.execute(query).scalar()
-        if result:
-              return True
-        else:
-              return False
+        return result

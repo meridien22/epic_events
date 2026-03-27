@@ -68,6 +68,7 @@ def init_db():
 
         department = session.query(Department).filter_by(name='Management').first()
         permissions=[
+            "SELECT_USER",
             "CREATE_USER",
             "UPDATE_USER",
             "DELETE_USER",
@@ -198,25 +199,27 @@ def init_db():
             session.add(location)
 
         # Ajout des événements
-        # query = select(Contract.id).where(Contract.total_amount == 50000)
-        # contract_id = session.execute(query).scalar()
-        # query = select(User.id).where(User.email == "support@proton.fr")
-        # user_id = session.execute(query).scalar()
-        # query = select(Location.id).where(Location.city == "Franceville")
-        # location_id = session.execute(query).scalar()
-        # events = [
-        #     ["Anniversaire de Gégé", "Partie", 2500, contract_id, user_id, location_id],
-        # ]
-        # for event_param in events:
-        #     event = Event(
-        #         name = event_param[0],
-        #         type_event = event_param[1],
-        #         expected_audience = event_param[2],
-        #         contract_id =event_param[3],
-        #         support_id = event_param[4],
-        #         location_id = event_param[5],
-        #     )
-        #     session.add(event)
+        query = select(Contract.id).where(Contract.total_amount == 50000)
+        contract_id = session.execute(query).scalar()
+        query = select(User.id).where(User.email == "support@proton.fr")
+        user_id = session.execute(query).scalar()
+        query = select(Location.id).where(Location.city == "Franceville")
+        location_id = session.execute(query).scalar()
+        events = [
+            ["Anniversaire de Gégé", "Partie", 2500, contract_id, user_id, location_id, "2026-06-21", "2026-06-22"],
+        ]
+        for event_param in events:
+            event = Event(
+                name = event_param[0],
+                type_event = event_param[1],
+                expected_audience = event_param[2],
+                contract_id =event_param[3],
+                support_id = event_param[4],
+                location_id = event_param[5],
+                date_start = event_param[6],
+                date_end = event_param[7],
+            )
+            session.add(event)
 
         session.commit()
 

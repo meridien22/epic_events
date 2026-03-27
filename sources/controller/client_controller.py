@@ -7,7 +7,8 @@ def get_table_for_all_clients():
         dao = DAO(session)
         clients = dao.client.get_all()
         if not clients:
-            raise DatabaseError("Aucun client trouvé.") 
+            raise DatabaseError("Aucun client trouvé.")
+        
         table_data = []
         for client in clients:
             list = []
@@ -29,6 +30,8 @@ def get_table_for_all_clients():
             "Email",
             "Téléphone",
             "Date création",
-            "Date mise à jour", "Entreprise", "Commercial"
+            "Date mise à jour",
+            "Entreprise",
+            "Commercial"
         ]
         return headers, table_data

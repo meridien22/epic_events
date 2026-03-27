@@ -39,7 +39,7 @@ class Token:
             
             refresh_payload = {
                 "sub": str(id_user),
-                "exp": now + timedelta(days=1),
+                "exp": now + timedelta(days=0.5),
                 "type": "refresh"
             }
 
