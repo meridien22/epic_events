@@ -4,7 +4,6 @@ from sources.command.tool_command import UserView
 from sources.controller.token_controller import Token
 from sources.exceptions import EpicEventsError
 from sources.controller.user_controller import (
-    get_departments,
     add,
     get_table_for_all_users,
     exists,
@@ -13,6 +12,7 @@ from sources.controller.user_controller import (
     set_attribute,
     delete
 )
+from sources.controller.department_controller import get_departments
 from sources.controller.authorisation_controller import login_required, permission_required
 
 @click.command()

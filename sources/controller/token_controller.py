@@ -12,6 +12,14 @@ class Session:
         self.refresh_token = None
         self.user_id = None
         self.department_id = None
+        self.first_name= None
+        self.last_name = None
+
+    def __str__(self):
+            if self.first_name is None:
+                return "Aucun utilisateur connecté"
+            else:
+                return f"Utilisateur connecté : {self.first_name} ({self.last_name})"
 
 current_session = Session()
 
@@ -59,6 +67,8 @@ class Token:
             current_session.refresh_token = refresh_token
             current_session.user_id = id_user
             current_session.department_id = user.department.id
+            current_session.first_name = user.first_name
+            current_session.last_name= user.last_name
 
             return user
         
@@ -105,6 +115,5 @@ class Token:
             raise AuthError("Token expiré.")
         except Exception as error:
             raise AuthError("Token invalide.")
-        
 
 token = Token()

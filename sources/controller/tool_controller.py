@@ -20,6 +20,12 @@ class Validators():
             raise FormError("Ce nom n'est pas valide.")
         
     @staticmethod
+    def valid_phone_number(value):
+        pattern = r"^[\d()+ ]+$"
+        if not re.match(pattern, value):
+            raise FormError("Ce numéro de téléphone n'est pas valide.")
+        
+    @staticmethod
     def valid_password(value):
         pattern = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>-_]).{3,}$"
         if not re.match(pattern, value):
@@ -29,7 +35,7 @@ class Validators():
     def valid_amount(value):
         try:
             num = float(value)
-            if num<=0:
+            if num<0:
                raise FormError("Le montant n'est pas valide.") 
         except (ValueError, TypeError):
             raise FormError("Le montant n'est pas valide.")
@@ -48,5 +54,13 @@ class Tools():
         choices = []
         for key in dict_:
             choice = f"[{key}] {dict_[key][0]}"
+            choices.append(choice)
+        return "\n".join(choices)
+    
+    @staticmethod
+    def get_choice_dict(dict_):
+        choices = []
+        for key in dict_:
+            choice = f"[{key}] {dict_[key]}"
             choices.append(choice)
         return "\n".join(choices)

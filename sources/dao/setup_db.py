@@ -90,49 +90,38 @@ def init_db():
             department.permissions.append(permission)
         
         # Ajout des utilisateurs
-        query = select(Department.id).where(Department.name == "Sales")
-        department_id = session.execute(query).scalar()
-        user = User(
-            first_name="Denis",
-            last_name="Sales",
-            email="sales@proton.fr",
-            department_id=department_id,
-        )
-        user.set_password(parameter["password_sales"])
-        session.add(user)
-
         query = select(Department.id).where(Department.name == "Support")
-        department_id = session.execute(query).scalar()
-        user = User(
-            first_name="Alain",
-            last_name="Support",
-            email="support@proton.fr",
-            department_id=department_id,
-        )
-        user.set_password(parameter["password_support"]),
-        session.add(user)
-
+        department_support_id = session.execute(query).scalar()
+        query = select(Department.id).where(Department.name == "Sales")
+        department_sales_id = session.execute(query).scalar()
         query = select(Department.id).where(Department.name == "Management")
-        department_id = session.execute(query).scalar()
-        user = User(
-            first_name="Sophie",
-            last_name="Management",
-            email="management@proton.fr",
-            department_id=department_id,
-        )
-        user.set_password(parameter["password_management"]),
-        session.add(user)
-
+        department_management_id = session.execute(query).scalar()
         query = select(Department.id).where(Department.name == "Admin")
-        department_id = session.execute(query).scalar()
-        user = User(
-            first_name = "Véronique",
-            last_name = "Admin",
-            email = "admin@proton.fr",
-            department_id = department_id,
-        )
-        user.set_password(parameter["password_admin"]),
-        session.add(user)
+        department_admin_id = session.execute(query).scalar()
+        users = [
+            ["Alain", "Support", "support1@proton.fr", department_support_id],
+            ["Eric", "Support", "support2@proton.fr", department_support_id],
+            ["Denis", "Sales", "sales@proton.fr", department_sales_id],
+            ["Sophie", "Management", "management@proton.fr", department_management_id],
+            ["Véronique", "Admin", "admin@proton.fr", department_admin_id],
+        ]
+        for user_param in users:
+            user = User(
+                first_name=user_param[0],
+                last_name=user_param[1],
+                email=user_param[2],
+                department_id=user_param[3],
+            )
+            match user_param[1]:
+                case "Support":
+                    user.set_password(parameter["password_support"]),
+                case "Sales":
+                    user.set_password(parameter["password_sales"]),
+                case "Management":
+                    user.set_password(parameter["password_management"]),
+                case "Admin":
+                    user.set_password(parameter["password_admin"]),
+            session.add(user)
 
         # Ajout des entrerpises
         enterprises = ["Sobraga", "Setrag"]
@@ -201,7 +190,7 @@ def init_db():
         # Ajout des événements
         query = select(Contract.id).where(Contract.total_amount == 50000)
         contract_id = session.execute(query).scalar()
-        query = select(User.id).where(User.email == "support@proton.fr")
+        query = select(User.id).where(User.email == "support1@proton.fr")
         user_id = session.execute(query).scalar()
         query = select(Location.id).where(Location.city == "Franceville")
         location_id = session.execute(query).scalar()

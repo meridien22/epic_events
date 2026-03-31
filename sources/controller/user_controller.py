@@ -5,11 +5,6 @@ from sqlalchemy.exc import IntegrityError
 from sources.controller.tool_controller import Validators
 from sources.exceptions import EpicEventsError
 
-def get_departments():
-    with SessionLocal() as session:
-        dao = DAO(session)
-        return dao.departement.get_all()
-
 def add(first_name, last_name, email, password, department_id):
     with SessionLocal() as session:
         try:
@@ -56,6 +51,20 @@ def get_table_for_all_users():
             "Département",
         ]
         return headers, table_data
+    
+def get_dict_user_support():
+    with SessionLocal() as session:
+        dao = DAO(session)
+        support_departements = dao.departement.filter_by_attribute_egal("name","Support")
+        department_id = support_departements[0].id
+        users = dao.user.filter_by_attribute_egal("department_id",department_id)
+        if not users:
+            raise DatabaseError("Aucun utilisateur trouvé.") 
+        dict_ = {}
+        for user in users:
+            dict_[user.id] = f"{user.first_name} {user.last_name}"
+        
+        return dict_
 
 def exists(id_user):
     with SessionLocal() as session:
@@ -66,6 +75,11 @@ def get(id_user):
     with SessionLocal() as session:
         dao = DAO(session)
         return dao.user.get_by_id(id_user)
+    
+def get_all():
+    with SessionLocal() as session:
+        dao = DAO(session)
+        return dao.user.get_all()
 
 def get_department_name(id_user):
     with SessionLocal() as session:

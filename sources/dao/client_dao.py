@@ -7,3 +7,4 @@ class ClientDAO(BaseDAO):
     def __init__(self, session):
         super().__init__(session)
         self.model = Client
+

@@ -26,6 +26,17 @@ class BaseDAO:
             query = select(self.model)
             return self.session.execute(query).scalars().all()
     
+    def filter_by_attribute_egal(self, attr_name, value):
+         column = getattr(self.model, attr_name)
+         match value:
+            case "null" | "NULL" | "Null":
+                query = select(self.model).where(column.is_(None))
+            case "not null" | "NOT NULL":
+                query = select(self.model).where(column.isnot(None))
+            case _:
+                query = select(self.model).where(column == value)
+         return self.session.execute(query).scalars().all()
+    
     def save(self, obj):
             self.session.add(obj)
             return obj

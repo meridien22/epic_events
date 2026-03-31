@@ -37,14 +37,49 @@ def add(client_id, total_amount):
             dao = DAO(session)
             if not dao.client.exists(client_id):
                 raise DatabaseError("Ce client n'existe pas.")
-            # Validators.valid_amount(total_amount)
-            # dao.contract.create(
-            #     client_id=client_id,
-            #     total_amount=total_amount,
-            #     remaining_amount=0,
-            # )
-            # session.commit()
+            Validators.valid_amount(total_amount)
+            dao.contract.create(
+                client_id=client_id,
+                total_amount=total_amount,
+                remaining_amount=0,
+            )
+            session.commit()
         except EpicEventsError as e:
             raise e
         except Exception as e:
            raise DatabaseError("Enregistrement impossible.")
+
+def exists(id_contract):
+    with SessionLocal() as session:
+        dao = DAO(session)
+        return dao.contract.exists(id_contract)
+    
+def get(id_contract):
+    with SessionLocal() as session:
+        dao = DAO(session)
+        return dao.contract.get_by_id(id_contract)
+    
+def get_signature_status(contract):
+    if contract.is_signed:
+        return 'Oui'
+    else:
+        return 'Non'
+    
+def set_attribute(contract_id, attribute, new_value):
+    with SessionLocal() as session:
+        dao = DAO(session)
+        contract = dao.contract.get_by_id(contract_id)
+        setattr(contract, attribute, new_value)
+        try :
+            match attribute:
+                case "total_amount" | "remaining_amount":
+                    Validators.valid_amount(new_value)
+                case _:
+                    pass
+            session.commit()
+        except EpicEventsError as e:
+            session.rollback()
+            raise e
+        except Exception as e:
+            session.rollback()
+            raise DatabaseError("Enregistrement impossible.")

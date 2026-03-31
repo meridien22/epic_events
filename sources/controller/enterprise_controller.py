@@ -14,4 +14,9 @@ def add(name):
             raise DatabaseError("Entreprise non autorisé ou déjà utilisé.")
         except Exception as e:
             session.rollback()
-            raise DatabaseError("Une erreur inattendue est survenue.") 
+            raise DatabaseError("Une erreur inattendue est survenue.")
+        
+def get_enterprises():
+    with SessionLocal() as session:
+        dao = DAO(session)
+        return dao.enterprise.get_all()

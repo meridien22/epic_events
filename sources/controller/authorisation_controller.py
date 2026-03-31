@@ -16,7 +16,9 @@ def login_required(f):
             # raise AuthError("Aucun token trouvé. Veuillez vous connecter (login).")
             click.secho("Aucun token trouvé. Veuillez vous connecter (login).", bold=True)
             raise click.Abort()
-        if not token.is_valid_access_refresh() :
+        try:
+            token.is_valid_access_refresh()
+        except:
             # raise AuthError("Erreur d'authentification : session invalide ou expirée.")
             click.secho("Erreur d'authentification : session invalide ou expirée.", bold=True)
             raise click.Abort()
@@ -61,6 +63,28 @@ def owns_event(f):
             if not event.support_id == current_session.user_id:
                 # raise AuthError("Accès refusé : vous devez être le gestionnaire de l'événement pour pouvoir le modifier.")
                 click.secho("Accès refusé : vous devez être le gestionnaire de l'événement pour pouvoir le modifier.", bold=True)
+                raise click.Abort()
+        return f(*args, **kwargs)
+    return wrapper
+
+def owns_client(f):
+    """Gestion de l'Object Access sur client"""
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        with SessionLocal() as session:
+            # click ajouter les paramètres de la commande comme des arguments de la fonction
+            client_id = kwargs.get('client_id')
+            # on vérifie si le client existe dans la base
+            dao = DAO(session)
+            if not dao.client.exists(client_id):
+                # raise DatabaseError("Evénement inconnu dans la base.")
+                click.secho("Client inconnu dans la base.", bold=True)
+                raise click.Abort()
+            # on vérifie que l'utilisateur est bien le support de l'event
+            client = dao.client.get_by_id(client_id)
+            if not client.commercial_id == current_session.user_id:
+                # raise AuthError("Accès refusé : vous devez être le gestionnaire de l'événement pour pouvoir le modifier.")
+                click.secho("Accès refusé : vous devez être le gestionnaire du client pour pouvoir le modifier.", bold=True)
                 raise click.Abort()
         return f(*args, **kwargs)
     return wrapper
