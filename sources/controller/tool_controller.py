@@ -48,7 +48,6 @@ class Tools():
         menu_choice = "\n".join([f" [{k}] {v}" for k, v in liste_choice.items()])
         return liste_choice, menu_choice
     
-
     @staticmethod
     def get_choice_from_field_update(dict_):
         choices = []
@@ -64,3 +63,9 @@ class Tools():
             choice = f"[{key}] {dict_[key]}"
             choices.append(choice)
         return "\n".join(choices)
+    
+    # @staticmethod
+    # def raise_if_none(value, message):
+    #     if value is None:
+    #         UserView.display_error(f"Aucun contrat pour associer l'événement.")
+    #         raise click.Abort()

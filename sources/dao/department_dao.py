@@ -3,7 +3,7 @@ from sources.models import Department, Permission
 from sqlalchemy import select
 
 
-class DepartementDAO(BaseDAO):
+class DepartmentDAO(BaseDAO):
     def __init__(self, session):
         super().__init__(session)
         self.model = Department

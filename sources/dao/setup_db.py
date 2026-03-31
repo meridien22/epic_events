@@ -48,7 +48,7 @@ def init_db():
         permissions=[
             "CREATE_CLIENT",
             "UPDATE_MY_CLIENT",
-            "UPDATE_MY_CLIENT_CONTRACT",
+            "UPDATE_CONTRACT",
             "FILTER_CONTRACT",
             "CREATE_EVENT_CONTRACT",
             "CREATE_ENTERPRISE",
@@ -101,7 +101,8 @@ def init_db():
         users = [
             ["Alain", "Support", "support1@proton.fr", department_support_id],
             ["Eric", "Support", "support2@proton.fr", department_support_id],
-            ["Denis", "Sales", "sales@proton.fr", department_sales_id],
+            ["Denis", "Sales", "sales1@proton.fr", department_sales_id],
+            ["Valérie", "Sales", "sales2@proton.fr", department_sales_id],
             ["Sophie", "Management", "management@proton.fr", department_management_id],
             ["Véronique", "Admin", "admin@proton.fr", department_admin_id],
         ]
@@ -132,7 +133,7 @@ def init_db():
         # Ajout des clients
         query = select(Enterprise.id).where(Enterprise.name == "Sobraga")
         enterprise_id = session.execute(query).scalar()
-        query = select(User.id).where(User.email == "sales@proton.fr")
+        query = select(User.id).where(User.email == "sales1@proton.fr")
         user_id = session.execute(query).scalar()
         clients = [
             ["Marcel", "Dupont", "marcel@sobraga.ga", "0489562358", enterprise_id, user_id],

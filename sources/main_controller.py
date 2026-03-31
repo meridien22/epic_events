@@ -18,24 +18,27 @@ from sources.command.contract_command import (
     list_contract,
     add_contract,
     update_contract,
+    filter_contract,
 )
 from sources.command.event_command import (
     list_event,
     filter_event,
     add_support,
+    add_event,
 )
-from sources.controller.token_controller import current_session
-
+from sources.controller.authorisation_controller import read_user_from_token
+from sources.command.tool_command import UserView
 
 # init_db()
 
 @click.group()
 def cli():
     click.clear()
-    click.echo(click.style("=== EPIC EVENTS CRM ===", fg="cyan", bold=True))
-    click.echo("-" * 23)
-    print(current_session)
-    click.echo("-" * 23)
+    UserView.display_separation_line()
+    UserView.display_epic_title()
+    UserView.display_separation_line()
+    UserView.display_parameter(read_user_from_token())
+    UserView.display_separation_line()
 
 cli.add_command(login)
 cli.add_command(add_user)
@@ -54,10 +57,12 @@ cli.add_command(update_client)
 cli.add_command(list_contract)
 cli.add_command(add_contract)
 cli.add_command(add_contract)
+cli.add_command(filter_contract)
 
 cli.add_command(update_contract)
 
 cli.add_command(list_event)
 cli.add_command(filter_event)
 cli.add_command(add_support)
+cli.add_command(add_event)
 

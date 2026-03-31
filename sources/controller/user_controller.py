@@ -55,8 +55,8 @@ def get_table_for_all_users():
 def get_dict_user_support():
     with SessionLocal() as session:
         dao = DAO(session)
-        support_departements = dao.departement.filter_by_attribute_egal("name","Support")
-        department_id = support_departements[0].id
+        support_departments = dao.department.filter_by_attribute_egal("name","Support")
+        department_id = support_departments[0].id
         users = dao.user.filter_by_attribute_egal("department_id",department_id)
         if not users:
             raise DatabaseError("Aucun utilisateur trouvé.") 

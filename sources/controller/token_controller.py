@@ -4,7 +4,7 @@ from sources.exceptions import AuthError, DatabaseError, FileError
 from datetime import datetime, timedelta, timezone
 import jwt
 from sources.controller.security_controller import get_private_key_ssh, get_public_key_ssh
-
+from decouple import config
 
 class Session:
     def __init__(self):
@@ -14,12 +14,6 @@ class Session:
         self.department_id = None
         self.first_name= None
         self.last_name = None
-
-    def __str__(self):
-            if self.first_name is None:
-                return "Aucun utilisateur connecté"
-            else:
-                return f"Utilisateur connecté : {self.first_name} ({self.last_name})"
 
 current_session = Session()
 

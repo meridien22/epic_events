@@ -1,6 +1,10 @@
 import click
 from sources.controller.tool_controller import Tools
-from sources.controller.authorisation_controller import login_required, permission_required
+from sources.controller.authorisation_controller import (
+    login_required,
+    permission_required,
+    owns_contrat_or_permission,
+)
 from sources.command.tool_command import UserView
 from sources.controller.contract_controller import (
     get_table_for_all_contracts,
@@ -9,6 +13,8 @@ from sources.controller.contract_controller import (
     get,
     set_attribute,
     get_signature_status,
+    get_table_attribute_egal,
+    get_table_attribute_not_egal,
 )
 from sources.exceptions import EpicEventsError
 
@@ -44,7 +50,7 @@ def add_contract(client_id, amount):
 @click.command()
 @click.argument('contract_id', type=click.INT)
 @login_required
-@permission_required("UPDATE_CONTRACT")
+@owns_contrat_or_permission("UPDATE_CONTRACT")
 def update_contract(contract_id):
     """Modifier un contrat"""
     # on vérifie que le contrat existe
@@ -87,6 +93,31 @@ def update_contract(contract_id):
     try:
         set_attribute(contract_id, attribute, new_value)
         UserView.display_success(f"Champ {label} modifié.")
+    except EpicEventsError as e:
+        error_type = e.__class__.__name__
+        UserView.display_error(f"[{error_type}] : {str(e)}")
+
+@click.command()
+@login_required
+@permission_required("FILTER_CONTRACT")
+def filter_contract():
+    """Filtrer les contrats"""
+    choices = {
+        "1": "Contrats non signés",
+        "2": "Contrats non payés",
+    }
+    choice = click.prompt(
+        f"Choix du filtre :\n{Tools.get_choice_dict(choices)}\nVotre choix ",
+        type=click.Choice(choices.keys()),
+        show_choices=False
+    )
+    try:
+        match choice:
+            case "1":
+                table = get_table_attribute_egal("is_signed", "False")
+            case "2":
+                table = get_table_attribute_not_egal("remaining_amount", 0)
+        UserView.display_table("Liste des contrats", table[0], table[1])
     except EpicEventsError as e:
         error_type = e.__class__.__name__
         UserView.display_error(f"[{error_type}] : {str(e)}")
