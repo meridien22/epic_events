@@ -1,5 +1,5 @@
 from sources.dao.base_dao import BaseDAO
-from sources.models import Contract, Client
+from sources.ress.models import Contract, Client
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
 

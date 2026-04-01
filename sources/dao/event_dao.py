@@ -1,5 +1,5 @@
 from sources.dao.base_dao import BaseDAO
-from sources.models import Event
+from sources.ress.models import Event
 from sqlalchemy import select
 
 

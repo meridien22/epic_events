@@ -1,5 +1,5 @@
 from sources.dao.base_dao import BaseDAO
-from sources.models import User
+from sources.ress.models import User
 from sqlalchemy import select
 
 class UserDAO(BaseDAO):

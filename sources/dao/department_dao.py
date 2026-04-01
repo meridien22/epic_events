@@ -1,5 +1,5 @@
 from sources.dao.base_dao import BaseDAO
-from sources.models import Department, Permission
+from sources.ress.models import Department, Permission
 from sqlalchemy import select
 
 

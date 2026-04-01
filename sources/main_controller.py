@@ -1,44 +1,44 @@
-from sources.dao.setup_db import init_db
+from sources.ress.setup_db import init_db
 import click
-from sources.command.department_command import add_department
-from sources.command.user_command import (
+from sources.cmd.department_cmd import add_department
+from sources.cmd.user_cmd import (
     login,
     add_user,
     list_user,
     update_user,
     delete_user,
 )
-from sources.command.client_command import (
+from sources.cmd.client_cmd import (
     list_client,
     add_client,
     update_client,
 )
-from sources.command.enterprise_command import add_enterprise
-from sources.command.contract_command import (
+from sources.cmd.enterprise_cmd import add_enterprise
+from sources.cmd.contract_cmd import (
     list_contract,
     add_contract,
     update_contract,
     filter_contract,
 )
-from sources.command.event_command import (
+from sources.cmd.event_cmd import (
     list_event,
     filter_event,
     add_support,
     add_event,
 )
-from sources.controller.authorisation_controller import read_user_from_token
-from sources.command.tool_command import UserView
+from sources.ress.authorisation import read_user_from_token
+from sources.ress.view import View
 
 # init_db()
 
 @click.group()
 def cli():
     click.clear()
-    UserView.display_separation_line()
-    UserView.display_epic_title()
-    UserView.display_separation_line()
-    UserView.display_parameter(read_user_from_token())
-    UserView.display_separation_line()
+    View.display_separation_line()
+    View.display_epic_title()
+    View.display_separation_line()
+    View.display_parameter(read_user_from_token())
+    View.display_separation_line()
 
 cli.add_command(login)
 cli.add_command(add_user)
