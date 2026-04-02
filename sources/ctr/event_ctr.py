@@ -1,23 +1,17 @@
 from sources.dao import DAO
 from sources.ctr.base_ctr import BaseCTR
-from sources.ress.exceptions import DatabaseError
+from sources.ress.exceptions import FormError, DatabaseError
 from sources.dao.base_dao import SessionLocal
-from sources.ress.exceptions import EpicEventsError
+from sources.ress.validators import Validators
+from sqlalchemy.exc import IntegrityError
+from sources.ress.token import current_session
 
 
 class EventCTR(BaseCTR):
     def __init__(self):
         super().__init__("event")
 
-    def get_table_for_all_events(self):
-        events = self.get_all()
-        return self.get_table_headers(events)
-
-    def get_table_attribute_egal(self, attribute, value):
-        events = self.get_attribute_egal(attribute, value)
-        return self.get_table_headers(events)
-
-    def get_table_headers(self, events):
+    def get_table_with_headers(self, events):
         table_data = []
         for event in events:
             list = []
@@ -53,3 +47,60 @@ class EventCTR(BaseCTR):
             "Emplacement",
         ]
         return headers, table_data
+
+    def add(self, event_data):
+        with SessionLocal() as session:
+            try:
+                for key, value in event_data.items():
+                    self.validate_attribute(key, value)
+                dao = DAO(session)
+                dao.event.create(
+                    name = event_data["name"],
+                    contract_id = event_data["contract_id"],
+                    support_id = event_data["support_id"],
+                    location_id = event_data["location_id"],
+                    type_event = event_data["type_event"],
+                    date_start = event_data["date_start"],
+                    date_end = event_data["date_end"],
+                    expected_audience = event_data["expected_audience"],
+                    note = event_data["note"],
+                )
+                session.commit()
+            except FormError as e:
+                session.rollback()
+                raise e
+            except IntegrityError as e:
+                session.rollback()
+                raise DatabaseError("Une erreur inattendue est survenue.")
+            except Exception as e:
+                session.rollback()
+                # raise DatabaseError("Une erreur inattendue est survenue.")
+                raise e
+
+    def get_events_for_current_commercial(self):
+        user_id = current_session.user_id
+        with SessionLocal() as session:
+            dao = DAO(session)
+            events = dao.event.get_events_user(user_id)
+            return events
+        
+    def get_type_event(self):
+        return {
+            "1": "Partie",
+            "2": "Business meeting",
+            "3": "Off-site event"
+        }
+    
+    def set_attribute_event(self, event_id, attribute, value):
+        try:
+            self.validate_attribute(attribute, value)
+            self.set_attribute(event_id, attribute, value)
+        except FormError as e:
+            raise e
+        
+    def validate_attribute(self, attribute, value):
+        match attribute:
+            case "name":
+                Validators.string_len(value,"nom",0, 50)
+            case "expected_audience":
+                Validators.valid_number_positive(value,"audience")

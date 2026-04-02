@@ -18,7 +18,8 @@ class View:
 
     @staticmethod
     def display_table(title, headers, data):
-        click.echo(f"\n--- {title} ---")
+        click.echo(click.style(f"{title}", fg="yellow"))
+        View.display_separation_line()
         click.echo(tabulate(data, headers=headers, tablefmt="grid"))
 
     @staticmethod

@@ -11,7 +11,8 @@ from sources.ctr import ctr
 def list_client():
     """Lister les clients."""
     try:
-        table = ctr.client.get_table_for_all_clients()
+        clients = ctr.client.get_all("enterprise", "commercial")
+        table = ctr.client.get_table_with_headers(clients)
         View.display_table("Liste des clients", table[0], table[1])
     except EpicEventsError as e:
         error_type = e.__class__.__name__
@@ -27,7 +28,7 @@ def add_client(first_name, last_name):
     email = View.display_prompt_string(f"Email du client")
     phone_number = View.display_prompt_string(f"Téléphone du client")
     try:
-        choices = ctr.enterprise.get_dict_for_choices("name")
+        choices = ctr.enterprise.get_dict_for_choices()
         enterprise_id = View.display_prompt_choices("Entreprises disponibles", choices)
         ctr.client.add(first_name, last_name, email, phone_number, enterprise_id)
         View.display_success(f"Client {first_name}  {last_name} créé.")
@@ -46,7 +47,8 @@ def update_client(client_id):
     try:
         ctr.client.exists(client_id)
         client = ctr.client.get(client_id)
-        View.display_info(f"Modification du client {client.first_name} {client.last_name}\n")
+        View.display_info(f"Modification du client {client.first_name} {client.last_name}")
+        View.display_separation_line()
         # on demande quel est le champ à modifier
         choices_user = {
             '1': f"Prénom : {client.first_name}",
@@ -68,7 +70,7 @@ def update_client(client_id):
             case "first_name" | "last_name" | "email" | "phone_number":
                 new_value = View.display_prompt_string(f"Nouvelle valeur pour {attribute}")
             case "enterprise_id":
-                choices = ctr.enterprise.get_dict_for_choices("name")
+                choices = ctr.enterprise.get_dict_for_choices()
                 new_value = View.display_prompt_choices("Entreprises disponibles", choices)
         ctr.client.set_attribute(client_id, attribute, new_value)
         View.display_success(f"Champ {attribute} modifié.")

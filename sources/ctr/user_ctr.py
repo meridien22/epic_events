@@ -14,10 +14,10 @@ class UserCTR(BaseCTR):
     def add(self, first_name, last_name, email, password, department_id):
         with SessionLocal() as session:
             try:
-                Validators.string_len(first_name,"first_name",0, 50)
-                Validators.string_len(first_name,"last_name",0, 50)
-                Validators.email(email)
-                Validators.valid_password(password)
+                self.validate_attribute("first_name", first_name)
+                self.validate_attribute("last_name", last_name)
+                self.validate_attribute("email", email)
+                self.validate_attribute("password", password)
                 dao = DAO(session)
                 dao.user.create(
                     first_name=first_name,
@@ -30,13 +30,13 @@ class UserCTR(BaseCTR):
             except IntegrityError as e:
                 session.rollback()
                 raise DatabaseError("Email non autorisé ou déjà utilisé.")
+            except FormError as e:
+                session.rollback()
+                raise e
             except Exception as e:
                 raise e
 
-    def get_table_for_all_users(self):
-        users = self.get_all()
-        if not users:
-            raise DatabaseError("Aucun utilisateur trouvé.") 
+    def get_table_with_headers(self, users): 
         table_data = []
         for user in users:
             list = []
@@ -58,16 +58,24 @@ class UserCTR(BaseCTR):
 
     def get_department_name(self, id_user):
         from sources.ctr import ctr
-        user = ctr.user.get_by_id(id_user)
+        user = ctr.user.get(id_user, "department")
         return user.department.name
             
-    def set_attribute(self, user_id, attribute, value):
+    def set_attribute_user(self, user_id, attribute, value):
         try:
-            match attribute:
-                case "first_name" | "last_name":
-                    Validators.valid_name(value)
-                case "email":
-                    Validators.email(value)
+            self.validate_attribute(attribute, value)
             self.set_attribute(user_id, attribute, value)
         except FormError as e:
             raise e
+        
+    def validate_attribute(self, attribute, value):
+        match attribute:
+            case "first_name":
+                Validators.string_len(value,"prénom",0, 50)
+            case "last_name":
+                Validators.string_len(value,"nom",0, 50)
+            case "email":
+                Validators.email(value)
+            case "password":
+                Validators.valid_password(value)
+            

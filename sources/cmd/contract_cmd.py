@@ -11,7 +11,8 @@ from sources.ctr import ctr
 def list_contract():
     """Lister les contrats."""
     try:
-        table = ctr.contract.get_table_for_all_contracts()
+        contracts = ctr.contract.get_all("client")
+        table = ctr.contract.get_table_with_headers(contracts)
         View.display_table("Liste des contrats", table[0], table[1])
     except EpicEventsError as e:
         error_type = e.__class__.__name__
@@ -73,7 +74,7 @@ def update_contract(contract_id):
                 choice = View.display_prompt_choices("Etat signature", values_user)
                 new_value = values_db[choice]
     
-        ctr.contract.set_attribute(contract_id, attribute, new_value)
+        ctr.contract.set_attribute_contract(contract_id, attribute, new_value)
         View.display_success(f"Champ {attribute} modifié.")
     except EpicEventsError as e:
         error_type = e.__class__.__name__
@@ -88,13 +89,15 @@ def filter_contract():
         "1": "Contrats non signés",
         "2": "Contrats non payés",
     }
-    choice = View.display_prompt_choices("Choix du filtre", values_user)
+    choice = View.display_prompt_choices("Choix du filtre", choices)
     try:
         match choice:
             case "1":
-                table = ctr.contract.get_table_attribute_egal("is_signed", "False")
+                contracts = ctr.contract.get_attribute_egal("is_signed", "False", "client")
+                table = ctr.contract.get_table_with_headers(contracts)
             case "2":
-                table = ctr.contract.get_table_attribute_not_egal("remaining_amount", 0)
+                contracts = ctr.contract.get_attribute_not_egal("remaining_amount", 0, "client")
+                table = ctr.contract.get_table_with_headers(contracts)
         View.display_table("Liste des contrats", table[0], table[1])
     except EpicEventsError as e:
         error_type = e.__class__.__name__

@@ -25,6 +25,7 @@ from sources.cmd.event_cmd import (
     filter_event,
     add_support,
     add_event,
+    update_event,
 )
 from sources.ress.authorisation import read_user_from_token
 from sources.ress.view import View
@@ -56,13 +57,12 @@ cli.add_command(update_client)
 
 cli.add_command(list_contract)
 cli.add_command(add_contract)
-cli.add_command(add_contract)
-cli.add_command(filter_contract)
-
 cli.add_command(update_contract)
+cli.add_command(filter_contract)
 
 cli.add_command(list_event)
 cli.add_command(filter_event)
 cli.add_command(add_support)
 cli.add_command(add_event)
+cli.add_command(update_event)
 

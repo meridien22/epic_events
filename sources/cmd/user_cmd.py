@@ -36,9 +36,9 @@ def add_user(first_name, last_name, email, password):
             email = click.prompt("Email de l'utilisateur")
         if not password:
             password = click.prompt("Mot de passe", hide_input=True, confirmation_prompt=True)
-        choices = ctr.department.get_dict_for_choices("name")
+        choices = ctr.department.get_dict_for_choices()
         department_id = View.display_prompt_choices("Départements disponibles", choices)
-        ctr.client.add(first_name, last_name, email, password, department_id)
+        ctr.user.add(first_name, last_name, email, password, department_id)
         View.display_success(f"Utilisateur {first_name}  {last_name} créé.")
     except Exception as e:
         error_type = e.__class__.__name__
@@ -50,7 +50,8 @@ def add_user(first_name, last_name, email, password):
 def list_user():
     """Lister les utilisateurs."""
     try:
-        table = ctr.user.get_table_for_all_users()
+        users = ctr.user.get_all("department")
+        table = ctr.user.get_table_with_headers(users)
         View.display_table("Liste des utilisateurs", table[0], table[1])
     except EpicEventsError as e:
         error_type = e.__class__.__name__
@@ -86,10 +87,10 @@ def update_user(user_id):
             case "first_name" | "last_name" | "email":
                 new_value = View.display_prompt_string(f"Nouvelle valeur pour {attribute}")
             case "department_id":
-                choices = ctr.department.get_dict_for_choices("name")
+                choices = ctr.department.get_dict_for_choices()
                 new_value = View.display_prompt_choices("Départements disponibles", choices)
 
-        ctr.user.set_attribute(user_id, attribute, new_value)
+        ctr.user.set_attribute_user(user_id, attribute, new_value)
         View.display_success(f"Champ {attribute} modifié.")
     except EpicEventsError as e:
         error_type = e.__class__.__name__

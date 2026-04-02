@@ -68,6 +68,9 @@ class Department(Base):
         ),
     )
 
+    def __str__(self):
+         return f"{self.name} ({self.id})"
+
 
 class Session(Base):
     __tablename__ = "session"
@@ -110,6 +113,9 @@ class User(Base):
                 return argon2.verify(password, self.password)
             except Exception:
                 return False
+            
+    def __str__(self):
+         return f"{self.first_name} {self.last_name} ({self.id})"
 
 
 class Enterprise(Base):
@@ -123,6 +129,9 @@ class Enterprise(Base):
     __table_args__ = (
         UniqueConstraint("name", name="unique_enterprise_name"),
     )
+
+    def __str__(self):
+         return f"{self.name} ({self.id})"
 
 
 class Client(Base):
@@ -166,6 +175,9 @@ class Contract(Base):
 
     event: Mapped[Optional["Event"]] = relationship(back_populates="contract")
 
+    def __str__(self):
+         return f"{self.total_amount} {self.date_creation} ({self.id})"
+
 
 class Event(Base):
     __tablename__ = 'event'
@@ -206,3 +218,6 @@ class Location(Base):
     country: Mapped[str] = mapped_column(String(50))
 
     events: Mapped[List["Event"]] = relationship(back_populates="location")
+
+    def __str__(self):
+         return f"{self.street} {self.postal_code} {self.city} {self.country} ({self.id}) "

@@ -1,6 +1,7 @@
 from sources.dao.base_dao import BaseDAO
 from sources.ress.models import User
 from sqlalchemy import select
+from sqlalchemy.orm import joinedload
 
 class UserDAO(BaseDAO):
     def __init__(self, session):

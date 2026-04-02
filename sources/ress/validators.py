@@ -14,10 +14,10 @@ class Validators():
             raise FormError("Le format de l'email est invalide.")
         
     @staticmethod
-    def valid_name(value):
+    def valid_name(value, attribute):
         pattern = r"^[a-zA-ZÀ-ÿ\s]{3,}$"
         if not re.match(pattern, value):
-            raise FormError("Ce nom n'est pas valide.")
+            raise FormError(f"Champ '{attribute}' non valide.")
         
     @staticmethod
     def valid_phone_number(value):
@@ -32,10 +32,10 @@ class Validators():
             raise FormError("Mot de passe non valide (au moins une minuscule, une majuscule et un caractère spécial).")
         
     @staticmethod
-    def valid_amount(value):
+    def valid_number_positive(value, attribute):
         try:
             num = float(value)
             if num<0:
-               raise FormError("Le montant n'est pas valide.") 
+               raise FormError("Le nombre pour {attribute} n'est pas valide.")
         except (ValueError, TypeError):
-            raise FormError("Le montant n'est pas valide.")
+            raise FormError("Le nombre pour {attribute} n'est pas valide.")

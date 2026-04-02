@@ -83,7 +83,24 @@ def init_db():
 
         department = session.query(Department).filter_by(name='Admin').first()
         permissions=[
-            "CREATE_DEPARTMENT"
+            "CREATE_DEPARTMENT",
+            "ADD_SUPPORT_TO_EVENT",
+            "CREATE_CLIENT",
+            "CREATE_CONTRACT",
+            "CREATE_ENTERPRISE",
+            "CREATE_EVENT_CONTRACT",
+            "CREATE_USER",
+            "DELETE_USER",
+            "FILTER_CONTRACT",
+            "FILTER_EVENT",
+            "SELECT_CLIENT",
+            "SELECT_CONTRACT",
+            "SELECT_EVENT",
+            "SELECT_USER",
+            "UPDATE_CONTRACT",
+            "UPDATE_MY_CLIENT",
+            "UPDATE_MY_EVENT",
+            "UPDATE_USER",
         ]
         for permission_name in permissions:
             permission = Permission(name=permission_name)
