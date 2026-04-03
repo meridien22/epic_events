@@ -1,8 +1,8 @@
 import click
 from sources.ress.authorisation import login_required, permission_required
 from sources.ress.view import View
-from sources.ress.exceptions import EpicEventsError
 from sources.ctr import ctr
+from sources.ress.context_manager import cmd_scope
 
 
 @click.command()
@@ -11,9 +11,6 @@ from sources.ctr import ctr
 @permission_required("CREATE_ENTERPRISE")
 def add_enterprise(name):
     """Ajouter une entreprise."""
-    try:
+    with cmd_scope():
         ctr.enterprise.add(name)
         View.display_success(f"Entreprise '{name}' créé.")
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")

@@ -1,21 +1,19 @@
 import click
 from sources.ress.view import View
-from sources.ress.exceptions import EpicEventsError, DatabaseError
+from sources.ress.exceptions import NotFoundError
 from sources.ress.authorisation import login_required, permission_required, owns_event
 from sources.ctr import ctr
+from sources.ress.context_manager import cmd_scope
 
 @click.command()
 @login_required
 @permission_required("SELECT_EVENT")
 def list_event():
     """Lister les événements."""
-    try:
+    with cmd_scope():
         events = ctr.event.get_all("support", "location")
         table = ctr.event.get_table_with_headers(events)
         View.display_table("Liste des événements", table[0], table[1])
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
 
 @click.command()
 @login_required
@@ -27,7 +25,7 @@ def filter_event():
         "2": "Mes événements",
     }
     choice = View.display_prompt_choices("Choix du filtre", choices)
-    try:
+    with cmd_scope():
         match choice:
             case "1":
                 events = ctr.event.get_attribute_egal("support_id", "NULL")
@@ -38,9 +36,6 @@ def filter_event():
             View.display_info("Aucun événement à afficher")
         else:
             View.display_table("Liste des contrats", table[0], table[1])
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
 
 @click.command()
 @click.argument('event_id', type=click.INT)
@@ -49,7 +44,7 @@ def filter_event():
 def add_support(event_id):
     """Associer un support à l'événement."""
     # on vérifie que l'événement existe
-    try:
+    with cmd_scope():
         ctr.event.exists(event_id)
         departments = ctr.department.get_attribute_egal("name", "Support")
         department_id = departments[0].id
@@ -58,9 +53,6 @@ def add_support(event_id):
         choice = View.display_prompt_choices("Choix du support", choices)
         ctr.event.set_attribute(event_id, "support_id", choice)
         View.display_success("Support attribué à l'événement")
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
 
 @click.command()
 @click.argument('name', type=click.STRING)
@@ -68,10 +60,10 @@ def add_support(event_id):
 @permission_required("CREATE_EVENT_CONTRACT")
 def add_event(name):
     """Créer un événement"""
-    try:
+    with cmd_scope():
         contracts = ctr.contract.get_unassigned_contracts_for_current_commercial()
         if not contracts:
-            raise DatabaseError("Aucun contrat pour associer l'événement.")
+            raise NotFoundError("Aucun contrat pour associer l'événement.")
         
         event_data = {"name": name}
 
@@ -101,9 +93,6 @@ def add_event(name):
 
         ctr.event.add(event_data)
         View.display_success(f"Evénement créé.")
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
 
 @click.command()
 @click.argument('event_id', type=click.INT)
@@ -114,7 +103,7 @@ def update_event(event_id):
     """
     Modifier une événement
     """
-    try:
+    with cmd_scope():
         ctr.event.exists(event_id)
         event = ctr.event.get(event_id, "contract", "support", "location")
         View.display_info(f"Modification de l'événement {event.name} {event.date_start}")
@@ -160,7 +149,7 @@ def update_event(event_id):
             case 'contract_id':
                 contracts = ctr.contract.get_unassigned_contracts_for_current_commercial()
                 if not contracts:
-                    raise DatabaseError("Aucun contrat pour associer l'événement.")
+                    raise NotFoundError("Aucun contrat pour associer l'événement.")
                 choices = ctr.contract.get_dict_for_choices_from_records(contracts)
                 new_value = View.display_prompt_choices('Choix du contrat', choices)
             case 'support_id':
@@ -174,6 +163,3 @@ def update_event(event_id):
                 new_value = View.display_prompt_choices("Choix de l'adresse", choices)
         ctr.event.set_attribute_event(event_id, attribute, new_value)
         View.display_success(f"Champ {attribute} modifié.")
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")

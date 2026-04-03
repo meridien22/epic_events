@@ -1,22 +1,18 @@
 import click
 from sources.ress.view import View
-from sources.ress.token import Token
-from sources.ress.exceptions import EpicEventsError, DatabaseError
 from sources.ress.authorisation import login_required, permission_required, owns_client
 from sources.ctr import ctr
+from sources.ress.context_manager import cmd_scope
 
 @click.command()
 @login_required
 @permission_required("SELECT_CLIENT")
 def list_client():
     """Lister les clients."""
-    try:
+    with cmd_scope():
         clients = ctr.client.get_all("enterprise", "commercial")
         table = ctr.client.get_table_with_headers(clients)
         View.display_table("Liste des clients", table[0], table[1])
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
 
 @click.command()
 @click.argument('first_name', type=click.STRING)
@@ -27,14 +23,11 @@ def add_client(first_name, last_name):
     """Ajouter un client."""
     email = View.display_prompt_string(f"Email du client")
     phone_number = View.display_prompt_string(f"Téléphone du client")
-    try:
+    with cmd_scope():
         choices = ctr.enterprise.get_dict_for_choices()
         enterprise_id = View.display_prompt_choices("Entreprises disponibles", choices)
         ctr.client.add(first_name, last_name, email, phone_number, enterprise_id)
         View.display_success(f"Client {first_name}  {last_name} créé.")
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
 
 @click.command()
 @click.argument('client_id', type=click.INT)
@@ -44,7 +37,7 @@ def add_client(first_name, last_name):
 def update_client(client_id):
     """Modifier un client."""
     # on vérifie que le client existe
-    try:
+    with cmd_scope():
         ctr.client.exists(client_id)
         client = ctr.client.get(client_id)
         View.display_info(f"Modification du client {client.first_name} {client.last_name}")
@@ -72,9 +65,5 @@ def update_client(client_id):
             case "enterprise_id":
                 choices = ctr.enterprise.get_dict_for_choices()
                 new_value = View.display_prompt_choices("Entreprises disponibles", choices)
-        ctr.client.set_attribute(client_id, attribute, new_value)
+        ctr.client.set_attribute_client(client_id, attribute, new_value)
         View.display_success(f"Champ {attribute} modifié.")
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
-

@@ -10,7 +10,7 @@ class View:
 
     @staticmethod
     def display_error(message):
-        click.echo(click.style(f"Erreur : {message}", fg="red"))
+        click.echo(click.style(f"Erreur : {message}", fg="magenta"))
 
     @staticmethod
     def display_info(message):

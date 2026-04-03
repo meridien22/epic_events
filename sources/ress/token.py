@@ -4,7 +4,6 @@ from sources.ress.exceptions import AuthError, DatabaseError, FileError
 from datetime import datetime, timedelta, timezone
 import jwt
 from sources.ress.security import get_private_key_ssh, get_public_key_ssh
-from decouple import config
 
 class Session:
     def __init__(self):

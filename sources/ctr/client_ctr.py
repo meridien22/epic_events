@@ -1,10 +1,8 @@
 from sources.ctr.base_ctr import BaseCTR
 from sources.dao import DAO
-from sources.ress.exceptions import FormError, DatabaseError
-from sources.dao.base_dao import SessionLocal
 from sources.ress.validators import Validators
-from sqlalchemy.exc import IntegrityError
 from sources.ress.token import current_session
+from sources.ress.context_manager import view_scope, transaction_scope
 
 
 class ClientCTR(BaseCTR):
@@ -40,40 +38,29 @@ class ClientCTR(BaseCTR):
         return headers, table_data
 
     def add(self, first_name, last_name, email, phone_number, enterprise_id):
-        with SessionLocal() as session:
-            try:
-                self.validate_attribute("first_name", first_name)
-                self.validate_attribute("last_name", last_name)
-                self.validate_attribute("email", email)
-                self.validate_attribute("phone_number", phone_number)
-                dao = DAO(session)
-                dao.client.create(
-                    first_name=first_name,
-                    last_name=last_name,
-                    email=email,
-                    phone_number=phone_number,
-                    enterprise_id=enterprise_id,
-                    commercial_id = current_session.user_id,
-                )
-                session.commit()
-            except IntegrityError as e:
-                session.rollback()
-                raise DatabaseError("Email non autorisé ou déjà utilisé.")
-            except FormError as e:
-                session.rollback()
-                raise e
-            except Exception as e:
-                raise e
+        self.validate_attribute("first_name", first_name)
+        self.validate_attribute("last_name", last_name)
+        self.validate_attribute("email", email)
+        self.validate_attribute("phone_number", phone_number)
+        with transaction_scope() as session:
+            dao = DAO(session)
+            dao.client.create(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                phone_number=phone_number,
+                enterprise_id=enterprise_id,
+                commercial_id = current_session.user_id,
+            )
+
 
     def set_attribute_client(self, id_client, attribute, value): 
-        try:
-            self.validate_attribute(attribute, value)
-            self.set_attribute(id_client, attribute, value)
-        except FormError as e:
-            raise e
+        self.validate_attribute(attribute, value)
+        self.set_attribute(id_client, attribute, value)
+ 
 
     def get_enterprise_name(self, client_id):
-        with SessionLocal() as session:
+        with view_scope() as session:
             dao = DAO(session)
             client = self.get(client_id, "enterprise")
             return client.enterprise.name
@@ -88,3 +75,10 @@ class ClientCTR(BaseCTR):
                 Validators.email(value)
             case "phone_number":
                 Validators.valid_phone_number(value)
+
+    def get_clients_for_current_commercial(self):
+        user_id = current_session.user_id
+        with view_scope() as session:
+            dao = DAO(session)
+            clients = dao.client.get_clients_user(user_id)
+            return clients

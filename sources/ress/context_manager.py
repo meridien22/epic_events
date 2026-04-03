@@ -1,0 +1,105 @@
+from contextlib import contextmanager
+from sqlalchemy.exc import IntegrityError
+from sources.dao.base_dao import SessionLocal
+from sources.ress.view import View
+import sentry_sdk
+from private.parameter import parameter
+from sources.ress.exceptions import (EpicEventsError, DatabaseError, FormError, 
+    AuthError, FileError, NotFoundError)
+import sys
+
+sentry_sdk.init(
+    dsn="https://2882e5f59408b433087d56d9597c210f@o4511156464713728.ingest.de.sentry.io/4511156468908112",
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+)
+
+@contextmanager
+def transaction_scope():
+    """Gère le cycle de vie d'une transaction SQL avec gestion d'erreurs."""
+    session = SessionLocal()
+    try:
+        yield session
+        session.commit()
+    except IntegrityError as e:
+        session.rollback()
+        raise DatabaseError("Donnée déjà existante ou non autorisé.")
+    except EpicEventsError as e:
+        session.rollback()
+        raise e
+    except Exception as e:
+        session.rollback()
+        raise DatabaseError("Une erreur inattendue est survenue.")
+    finally:
+        session.close()
+
+@contextmanager
+def view_scope():
+    """Gère le cycle de vie d'une transaction SQL (uniquement SELECT) avec gestion d'erreurs."""
+    session = SessionLocal()
+    try:
+        yield session
+    except EpicEventsError as e:
+        raise e
+    except Exception as e:
+        raise e
+    finally:
+        session.close()
+
+ERROR_LABELS = {
+    "DatabaseError": "ERREUR SQL",
+    "FormError": "SAISIE INCORRECTE",
+    "AuthError": "ACCES REFUSE",
+    "FileError": "ERREUR FICHIER",
+    "NotFoundError": "ECHEC RECHERCHE",
+}
+
+@contextmanager
+def auth_scope():
+    """Gère l'affichage des erreurs pour décorateurs d'authentification et d'autorisation."""
+    session = SessionLocal()
+    try:
+        yield session
+    except AuthError as e:
+        class_name = e.__class__.__name__
+        friendly_name = ERROR_LABELS.get(class_name, class_name)
+        View.display_info(f"[{friendly_name}] : {str(e)}")
+        sentry_sdk.capture_exception(e)
+        sys.exit()
+    except Exception as e:
+        View.display_error(f"[ERREUR CRITIQUE] : Une erreur inattendue est survenue.")
+        sentry_sdk.capture_exception(e)
+
+
+@contextmanager
+def cmd_scope():
+    """Gère l'affichage des erreurs pour les commandes CLI."""
+    try:
+        yield
+    except DatabaseError as e:
+        class_name = e.__class__.__name__
+        friendly_name = ERROR_LABELS.get(class_name, class_name)
+        View.display_error(f"[{friendly_name}] : {str(e)}")
+        sentry_sdk.capture_exception(e)
+    except FormError as e:
+        class_name = e.__class__.__name__
+        friendly_name = ERROR_LABELS.get(class_name, class_name)
+        View.display_info(f"[{friendly_name}] : {str(e)}")
+    except AuthError as e:
+        # sentry_sdk.capture_exception(e)
+        class_name = e.__class__.__name__
+        friendly_name = ERROR_LABELS.get(class_name, class_name)
+        View.display_error(f"[{friendly_name}] : {str(e)}")
+        sentry_sdk.capture_exception(e)
+    except FileError as e:
+        class_name = e.__class__.__name__
+        friendly_name = ERROR_LABELS.get(class_name, class_name)
+        View.display_error(f"[{friendly_name}] : {str(e)}")
+    except NotFoundError as e:
+        class_name = e.__class__.__name__
+        friendly_name = ERROR_LABELS.get(class_name, class_name)
+        View.display_info(f"[{friendly_name}] : {str(e)}")
+    except Exception as e:
+        View.display_error(f"[ERREUR CRITIQUE] : Une erreur inattendue est survenue.")
+        sentry_sdk.capture_exception(e)

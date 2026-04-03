@@ -160,6 +160,10 @@ class Client(Base):
         UniqueConstraint("email", name="unique_email_client_name"),
     )
 
+    def __str__(self):
+         return f"{self.first_name} {self.last_name} ({self.id})"
+
+
 
 class Contract(Base):
     __tablename__ = 'contract'

@@ -1,10 +1,8 @@
 from sources.dao import DAO
-from sources.ress.exceptions import DatabaseError
-from sources.dao.base_dao import SessionLocal
-from sqlalchemy.exc import IntegrityError
 from sources.ress.validators import Validators
 from sources.ress.exceptions import FormError
 from sources.ctr.base_ctr import BaseCTR
+from sources.ress.context_manager import transaction_scope
 
 
 class UserCTR(BaseCTR):
@@ -12,29 +10,19 @@ class UserCTR(BaseCTR):
         super().__init__("user")
 
     def add(self, first_name, last_name, email, password, department_id):
-        with SessionLocal() as session:
-            try:
-                self.validate_attribute("first_name", first_name)
-                self.validate_attribute("last_name", last_name)
-                self.validate_attribute("email", email)
-                self.validate_attribute("password", password)
-                dao = DAO(session)
-                dao.user.create(
-                    first_name=first_name,
-                    last_name=last_name,
-                    email=email,
-                    department_id=department_id,
-                    password=password
-                )
-                session.commit()
-            except IntegrityError as e:
-                session.rollback()
-                raise DatabaseError("Email non autorisé ou déjà utilisé.")
-            except FormError as e:
-                session.rollback()
-                raise e
-            except Exception as e:
-                raise e
+        self.validate_attribute("first_name", first_name)
+        self.validate_attribute("last_name", last_name)
+        self.validate_attribute("email", email)
+        self.validate_attribute("password", password)
+        with transaction_scope() as session:
+            dao = DAO(session)
+            dao.user.create(
+                first_name=first_name,
+                last_name=last_name,
+                email=email,
+                department_id=department_id,
+                password=password
+            )
 
     def get_table_with_headers(self, users): 
         table_data = []
@@ -62,20 +50,19 @@ class UserCTR(BaseCTR):
         return user.department.name
             
     def set_attribute_user(self, user_id, attribute, value):
-        try:
             self.validate_attribute(attribute, value)
             self.set_attribute(user_id, attribute, value)
+
+    def validate_attribute(self, attribute, value):
+        try:
+            match attribute:
+                case "first_name":
+                    Validators.string_len(value,"prénom",0, 50)
+                case "last_name":
+                    Validators.string_len(value,"nom",0, 50)
+                case "email":
+                    Validators.email(value)
+                case "password":
+                    Validators.valid_password(value)
         except FormError as e:
             raise e
-        
-    def validate_attribute(self, attribute, value):
-        match attribute:
-            case "first_name":
-                Validators.string_len(value,"prénom",0, 50)
-            case "last_name":
-                Validators.string_len(value,"nom",0, 50)
-            case "email":
-                Validators.email(value)
-            case "password":
-                Validators.valid_password(value)
-            

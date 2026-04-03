@@ -1,23 +1,21 @@
 import click
 from sources.ress.view import View
 from sources.ress.token import Token
-from sources.ress.exceptions import EpicEventsError, DatabaseError
 from sources.ress.authorisation import login_required, permission_required
 from sources.ctr import ctr
+from sources.ress.context_manager import cmd_scope
+import sentry_sdk
 
 @click.command()
 @click.option('--email', prompt=True, hide_input=False, help="Email")
 @click.option('--password', prompt=True, hide_input=True, help="Mot de passe")
 def login(email, password):
     """Se connecter."""
-    try:
+    with cmd_scope():
         token = Token()
         token.generate_token_from_email_password(email, password)
         View.display_success(f"Connexion réussie.")
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
-        
+
 @click.command()
 @click.argument('first_name', type=click.STRING)
 @click.argument('last_name', type=click.STRING)
@@ -31,7 +29,7 @@ def login(email, password):
 @permission_required("CREATE_USER")
 def add_user(first_name, last_name, email, password):
     """Ajouter un utilisateur."""
-    try:
+    with cmd_scope():
         if not email:
             email = click.prompt("Email de l'utilisateur")
         if not password:
@@ -39,24 +37,18 @@ def add_user(first_name, last_name, email, password):
         choices = ctr.department.get_dict_for_choices()
         department_id = View.display_prompt_choices("Départements disponibles", choices)
         ctr.user.add(first_name, last_name, email, password, department_id)
+        sentry_sdk.capture_message(f"Succès : Nouvel utilisateur {first_name} {last_name} {email} créé", level="info")
         View.display_success(f"Utilisateur {first_name}  {last_name} créé.")
-    except Exception as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
 
 @click.command()
 @login_required
 @permission_required("SELECT_USER")
 def list_user():
     """Lister les utilisateurs."""
-    try:
+    with cmd_scope():
         users = ctr.user.get_all("department")
         table = ctr.user.get_table_with_headers(users)
         View.display_table("Liste des utilisateurs", table[0], table[1])
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
-
 
 @click.command()
 @click.argument('user_id', type=click.INT)
@@ -64,7 +56,7 @@ def list_user():
 @permission_required("UPDATE_USER")
 def update_user(user_id):
     """Modifier un utilisateur."""
-    try:
+    with cmd_scope():
         ctr.user.exists(user_id)
         user = ctr.user.get(user_id)
         View.display_info(f"Modification de l'utilisateur {user.first_name} {user.last_name}\n")
@@ -89,12 +81,9 @@ def update_user(user_id):
             case "department_id":
                 choices = ctr.department.get_dict_for_choices()
                 new_value = View.display_prompt_choices("Départements disponibles", choices)
-
         ctr.user.set_attribute_user(user_id, attribute, new_value)
+        sentry_sdk.capture_message(f"Succès : Utilisateur {user.first_name} {user.last_name} {user.email} modifié", level="info")
         View.display_success(f"Champ {attribute} modifié.")
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
 
 @click.command()
 @click.argument('user_id', type=click.INT)
@@ -103,7 +92,7 @@ def update_user(user_id):
 def delete_user(user_id):
     """Supprimer un utilisateur."""
     # on vérifie que l'utilisateur existe
-    try:
+    with cmd_scope():
         ctr.user.exists(user_id)
         user = ctr.user.get(user_id)
         message = f"Êtes-vous sûr de vouloir supprimer {user.first_name} {user.last_name} ?"
@@ -112,7 +101,3 @@ def delete_user(user_id):
             View.display_success(f"Utilisateur supprimé.")
         else:
             View.display_success(f"Supression annulé.")
-    except EpicEventsError as e:
-        error_type = e.__class__.__name__
-        View.display_error(f"[{error_type}] : {str(e)}")
-

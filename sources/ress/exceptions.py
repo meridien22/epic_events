@@ -11,9 +11,13 @@ class DatabaseError(EpicEventsError):
     pass
 
 class FileError(EpicEventsError):
-    """Erreur lors d'une opération sur la base de données."""
+    """Erreur lors d'une opération sur les fichiers."""
     pass
 
 class FormError(EpicEventsError):
-    """Erreur lors d'une opération sur la base de données."""
+    """Erreur lors d'une opération sur un formulaire."""
+    pass
+
+class NotFoundError(EpicEventsError):
+    """Erreur lorsque la recherche de revoi aucun enregsitrement."""
     pass
