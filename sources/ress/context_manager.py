@@ -9,7 +9,7 @@ from sources.ress.exceptions import (EpicEventsError, DatabaseError, FormError,
 import sys
 
 sentry_sdk.init(
-    dsn="https://2882e5f59408b433087d56d9597c210f@o4511156464713728.ingest.de.sentry.io/4511156468908112",
+    dsn=parameter["sentry_dns"],
     # Add data like request headers and IP for users,
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,
