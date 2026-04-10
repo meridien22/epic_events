@@ -30,11 +30,13 @@ from sources.cmd.event_cmd import (
 from sources.ress.authorisation import read_user_from_token
 from sources.ress.view import View
 
+
 # init_db()
 
 
 @click.group()
 def cli():
+    """Create the CLI command group"""
     click.clear()
     View.display_separation_line()
     View.display_epic_title()
@@ -43,25 +45,31 @@ def cli():
     View.display_separation_line()
 
 
+# Added user commands
 cli.add_command(login)
 cli.add_command(add_user)
 cli.add_command(list_user)
 cli.add_command(update_user)
 cli.add_command(delete_user)
 
+# Added departement commands
 cli.add_command(add_department)
 
+# Added enterprise commands
 cli.add_command(add_enterprise)
 
+# Added client commands
 cli.add_command(list_client)
 cli.add_command(add_client)
 cli.add_command(update_client)
 
+# Added contract commands
 cli.add_command(list_contract)
 cli.add_command(add_contract)
 cli.add_command(update_contract)
 cli.add_command(filter_contract)
 
+# Added event commands
 cli.add_command(list_event)
 cli.add_command(filter_event)
 cli.add_command(add_support)

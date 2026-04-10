@@ -6,10 +6,12 @@ from sqlalchemy.orm import joinedload
 
 class ClientDAO(BaseDAO):
     def __init__(self, session):
+        """Defines model and session."""
         super().__init__(session)
         self.model = Client
 
     def get_clients_user(self, user_id):
+        """Returns a user's clients."""
         query = select(Client)
         rel_attr = getattr(self.model, "commercial")
         query = query.options(joinedload(rel_attr))

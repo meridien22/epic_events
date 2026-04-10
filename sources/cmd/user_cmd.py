@@ -11,7 +11,7 @@ import sentry_sdk
 @click.option('--email', prompt=True, hide_input=False, help="Email")
 @click.option('--password', prompt=True, hide_input=True, help="Mot de passe")
 def login(email, password):
-    """Se connecter."""
+    """Connect a user."""
     with cmd_scope():
         token = Token()
         token.generate_token_from_email_password(email, password)
@@ -30,7 +30,7 @@ def login(email, password):
 @login_required
 @permission_required("CREATE_USER")
 def add_user(first_name, last_name, email, password):
-    """Ajouter un utilisateur."""
+    """Add a user."""
     with cmd_scope():
         if not email:
             email = click.prompt("Email de l'utilisateur")
@@ -48,7 +48,7 @@ def add_user(first_name, last_name, email, password):
 @login_required
 @permission_required("SELECT_USER")
 def list_user():
-    """Lister les utilisateurs."""
+    """List all uers."""
     with cmd_scope():
         users = ctr.user.get_all("department")
         table = ctr.user.get_table_with_headers(users)
@@ -60,7 +60,7 @@ def list_user():
 @login_required
 @permission_required("UPDATE_USER")
 def update_user(user_id):
-    """Modifier un utilisateur."""
+    """Modify a user."""
     with cmd_scope():
         ctr.user.exists(user_id)
         user = ctr.user.get(user_id)
@@ -97,7 +97,7 @@ def update_user(user_id):
 @login_required
 @permission_required("DELETE_USER")
 def delete_user(user_id):
-    """Supprimer un utilisateur."""
+    """Delete a user."""
     # on vérifie que l'utilisateur existe
     with cmd_scope():
         ctr.user.exists(user_id)

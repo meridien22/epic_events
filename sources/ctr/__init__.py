@@ -8,6 +8,7 @@ from .user_ctr import UserCTR
 
 
 class CTR:
+    """Container class for controller classes."""
     def __init__(self):
         self.client = ClientCTR()
         self.contract = ContractCTR()

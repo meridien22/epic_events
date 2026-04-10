@@ -1,19 +1,14 @@
-from sources.dao.base_dao import Base
-
 from decimal import Decimal
-
 from typing import List, Optional
-
 from datetime import date, datetime
-
 from passlib.hash import argon2
-
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import MetaData
 from sqlalchemy.orm import (
     relationship,
     Mapped,
     mapped_column,
 )
-
 from sqlalchemy import (
     Integer,
     String,
@@ -29,6 +24,12 @@ from sqlalchemy import (
     Table,
 )
 
+
+class Base(DeclarativeBase):
+    """Configuring the SQL Alchemy base class."""
+    metadata = MetaData(schema="dev")
+
+
 departement_permissions = Table(
     "departement_permission",
     Base.metadata,
@@ -38,6 +39,7 @@ departement_permissions = Table(
 
 
 class Permission(Base):
+    """Model for managing user permissions."""
     __tablename__ = 'permission'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -49,6 +51,7 @@ class Permission(Base):
 
 
 class Department(Base):
+    """Model for managing departement users."""
     __tablename__ = 'department'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -72,18 +75,8 @@ class Department(Base):
         return f"{self.name} ({self.id})"
 
 
-class Session(Base):
-    __tablename__ = "session"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    refresh_token: Mapped[str] = mapped_column(String(50), unique=True)
-    expires_at: Mapped[datetime] = mapped_column(DateTime)
-
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), unique=True)
-    user: Mapped["User"] = relationship(back_populates="session")
-
-
 class User(Base):
+    """Model for managing user."""
     __tablename__ = 'user'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -98,8 +91,6 @@ class User(Base):
     clients: Mapped[List["Client"]] = relationship(back_populates="commercial")
 
     events: Mapped[List["Event"]] = relationship(back_populates="support")
-
-    session: Mapped[List["Session"]] = relationship(back_populates="user")
 
     __table_args__ = (
         UniqueConstraint("email", name="unique_email_user_name"),
@@ -119,6 +110,7 @@ class User(Base):
 
 
 class Enterprise(Base):
+    """Model for managing client enterprises."""
     __tablename__ = 'enterprise'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -135,6 +127,7 @@ class Enterprise(Base):
 
 
 class Client(Base):
+    """Model for managing clients."""
     __tablename__ = 'client'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -164,6 +157,7 @@ class Client(Base):
 
 
 class Contract(Base):
+    """Model for managing contracts."""
     __tablename__ = 'contract'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -182,6 +176,7 @@ class Contract(Base):
 
 
 class Event(Base):
+    """Model for managing events."""
     __tablename__ = 'event'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -210,6 +205,7 @@ class Event(Base):
 
 
 class Location(Base):
+    """Model for managing locations."""
     __tablename__ = 'location'
 
     id: Mapped[int] = mapped_column(primary_key=True)

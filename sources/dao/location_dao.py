@@ -4,5 +4,6 @@ from sources.ress.models import Location
 
 class LocationDAO(BaseDAO):
     def __init__(self, session):
+        """Defines model and session."""
         super().__init__(session)
         self.model = Location

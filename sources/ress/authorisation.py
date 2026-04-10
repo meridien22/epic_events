@@ -8,7 +8,7 @@ from sources.ress.context_manager import auth_scope
 
 
 def login_required(f):
-    """Gestion de l'authentification"""
+    """Authentication verification."""
     @wraps(f)
     def wrapper(*args, **kwargs):
         with auth_scope():
@@ -26,6 +26,7 @@ def login_required(f):
 
 
 def read_user_from_token():
+    """Reads the token's user information if the token is valid."""
     with auth_scope() as session:
         current_session.access_token = config("EPIC_EVENTS_ACCESS_TOKEN", default=None)
         current_session.refresh_token = config("EPIC_EVENTS_REFRESH_TOKEN", default=None)
@@ -43,7 +44,7 @@ def read_user_from_token():
 
 
 def permission_required(permission):
-    """Gestion des autorisations"""
+    """Checking permissions."""
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -60,7 +61,7 @@ def permission_required(permission):
 
 
 def owns_event(f):
-    """Gestion de l'Object Access sur event"""
+    """Checking Object Access on event"""
     @wraps(f)
     def wrapper(*args, **kwargs):
         with auth_scope() as session:
@@ -82,7 +83,7 @@ def owns_event(f):
 
 
 def owns_client(f):
-    """Gestion de l'Object Access sur client"""
+    """Checking Object Access on client"""
     @wraps(f)
     def wrapper(*args, **kwargs):
         with auth_scope() as session:
@@ -103,7 +104,7 @@ def owns_client(f):
 
 
 def owns_contrat_or_permission(permission):
-    """Gestion des autorisations"""
+    """Checking Object Access on contract"""
     def decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):

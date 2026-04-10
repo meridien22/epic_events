@@ -9,6 +9,7 @@ from .location_dao import LocationDAO
 
 class DAO:
     def __init__(self, session):
+        """Container class for DAO classes."""
         self.session = session
         self.user = UserDAO(self.session)
         self.department = DepartmentDAO(self.session)

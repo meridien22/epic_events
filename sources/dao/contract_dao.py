@@ -6,13 +6,12 @@ from sqlalchemy.orm import joinedload
 
 class ContractDAO(BaseDAO):
     def __init__(self, session):
+        """Defines model and session."""
         super().__init__(session)
         self.model = Contract
 
     def get_unassigned_contracts_for_commercial(self, user_id):
-        """
-        Retourne les contrats qui n'ont pas encore d'événement associé.
-        """
+        """Returns contracts that do not yet have an associated event."""
         subquery = select(Event.contract_id).scalar_subquery()
         # cette version de jointure fait un INNER JOIN (ramène que les contrats qui ont un client)
         query = (
@@ -25,9 +24,7 @@ class ContractDAO(BaseDAO):
         return self.session.execute(query).scalars().all()
 
     def get_contracts_with_commercial(self):
-        """
-        Retourne les contrats avec le nom du client et du commercial.
-        """
+        """Return the contracts with the name of the client and the salesperson."""
         # cette version de jointure fait un LEFT JOIN (ramène tous les contrats même ceux qui n'ont pas de client)
         query = (
             select(Contract)

@@ -1,4 +1,5 @@
-from sources.dao.base_dao import engine, Base
+from sources.ress.models import Base
+from sources.ress.session import engine
 from sources.ress.models import Department, Permission, User, Enterprise, Client, Contract, Location, Event
 from sources.dao.base_dao import SessionLocal
 from private.parameter import parameter
@@ -6,10 +7,11 @@ from sqlalchemy import select, text
 
 
 def init_db():
+    # Create all the tables in the database.
     Base.metadata.create_all(engine)
 
+    # Inserts the data into the tables.
     with SessionLocal() as session:
-
         # Mise à zéro de la base de donnée
         tables = [
             "event",

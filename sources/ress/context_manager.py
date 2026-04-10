@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from sqlalchemy.exc import IntegrityError
-from sources.dao.base_dao import SessionLocal
+from sources.ress.session import SessionLocal
 from sources.ress.view import View
 import sentry_sdk
 from private.parameter import parameter
@@ -10,15 +10,13 @@ import sys
 
 sentry_sdk.init(
     dsn=parameter["sentry_dns"],
-    # Add data like request headers and IP for users,
-    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,
 )
 
 
 @contextmanager
 def transaction_scope():
-    """Gère le cycle de vie d'une transaction SQL avec gestion d'erreurs."""
+    """Manages the lifecycle of an SQL transaction with error handling."""
     session = SessionLocal()
     try:
         yield session
@@ -38,7 +36,7 @@ def transaction_scope():
 
 @contextmanager
 def view_scope():
-    """Gère le cycle de vie d'une transaction SQL (uniquement SELECT) avec gestion d'erreurs."""
+    """Manages the lifecycle of an SQL transaction (SELECT only) with error handling."""
     session = SessionLocal()
     try:
         yield session
@@ -61,7 +59,7 @@ ERROR_LABELS = {
 
 @contextmanager
 def auth_scope():
-    """Gère l'affichage des erreurs pour décorateurs d'authentification et d'autorisation."""
+    """Manages the display of errors for authentication and authorization decorators."""
     session = SessionLocal()
     try:
         yield session
@@ -78,7 +76,7 @@ def auth_scope():
 
 @contextmanager
 def cmd_scope():
-    """Gère l'affichage des erreurs pour les commandes CLI."""
+    """Manages the display of errors for CLI commands."""
     try:
         yield
     except DatabaseError as e:

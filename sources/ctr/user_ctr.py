@@ -7,9 +7,11 @@ from sources.ress.context_manager import transaction_scope
 
 class UserCTR(BaseCTR):
     def __init__(self):
+        """Defines the name of the DAO associated with the model."""
         super().__init__("user")
 
     def add(self, first_name, last_name, email, password, department_id):
+        """Opens a session to add a new user."""
         self.validate_attribute("first_name", first_name)
         self.validate_attribute("last_name", last_name)
         self.validate_attribute("email", email)
@@ -25,6 +27,7 @@ class UserCTR(BaseCTR):
             )
 
     def get_table_with_headers(self, users):
+        """Returns a tuple composed of the headers and rows of the table represented as a list."""
         table_data = []
         for user in users:
             list = []
@@ -45,15 +48,18 @@ class UserCTR(BaseCTR):
         return headers, table_data
 
     def get_department_name(self, id_user):
+        """Returns the user's department name."""
         from sources.ctr import ctr
         user = ctr.user.get(id_user, "department")
         return user.department.name
 
     def set_attribute_user(self, user_id, attribute, value):
+        """Validates a value for an attribute and updates it using the base method."""
         self.validate_attribute(attribute, value)
         self.set_attribute(user_id, attribute, value)
 
     def validate_attribute(self, attribute, value):
+        """Validates the attribute value of the model."""
         try:
             match attribute:
                 case "first_name":

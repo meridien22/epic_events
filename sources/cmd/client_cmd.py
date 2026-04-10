@@ -9,7 +9,7 @@ from sources.ress.context_manager import cmd_scope
 @login_required
 @permission_required("SELECT_CLIENT")
 def list_client():
-    """Lister les clients."""
+    """List of all clients."""
     with cmd_scope():
         clients = ctr.client.get_all("enterprise", "commercial")
         table = ctr.client.get_table_with_headers(clients)
@@ -22,7 +22,7 @@ def list_client():
 @login_required
 @permission_required("CREATE_CLIENT")
 def add_client(first_name, last_name):
-    """Ajouter un client."""
+    """Add a client."""
     email = View.display_prompt_string("Email du client")
     phone_number = View.display_prompt_string("Téléphone du client")
     with cmd_scope():
@@ -38,7 +38,7 @@ def add_client(first_name, last_name):
 @permission_required("UPDATE_MY_CLIENT")
 @owns_client
 def update_client(client_id):
-    """Modifier un client."""
+    """Modify a client."""
     # on vérifie que le client existe
     with cmd_scope():
         ctr.client.exists(client_id)

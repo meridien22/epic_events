@@ -10,7 +10,7 @@ from sources.ress.context_manager import cmd_scope
 @login_required
 @permission_required("SELECT_EVENT")
 def list_event():
-    """Lister les événements."""
+    """List all events."""
     with cmd_scope():
         events = ctr.event.get_all("support", "location")
         table = ctr.event.get_table_with_headers(events)
@@ -21,7 +21,7 @@ def list_event():
 @login_required
 @permission_required("FILTER_EVENT")
 def filter_event():
-    """Filtrer les événements."""
+    """Filtered list of events."""
     choices = {
         "1": "Evénements sans support",
         "2": "Mes événements",
@@ -45,7 +45,7 @@ def filter_event():
 @login_required
 @permission_required("ADD_SUPPORT_TO_EVENT")
 def add_support(event_id):
-    """Associer un support à l'événement."""
+    """To associate support with the event."""
     # on vérifie que l'événement existe
     with cmd_scope():
         ctr.event.exists(event_id)
@@ -63,7 +63,7 @@ def add_support(event_id):
 @login_required
 @permission_required("CREATE_EVENT_CONTRACT")
 def add_event(name):
-    """Créer un événement"""
+    """Create an event."""
     with cmd_scope():
         contracts = ctr.contract.get_unassigned_contracts_for_current_commercial()
         if not contracts:
@@ -105,9 +105,7 @@ def add_event(name):
 @permission_required("UPDATE_MY_EVENT")
 @owns_event
 def update_event(event_id):
-    """
-    Modifier une événement
-    """
+    """Modify an event"""
     with cmd_scope():
         ctr.event.exists(event_id)
         event = ctr.event.get(event_id, "contract", "support", "location")

@@ -10,7 +10,7 @@ import sentry_sdk
 @login_required
 @permission_required("SELECT_CONTRACT")
 def list_contract():
-    """Lister les contrats."""
+    """List all contracts."""
     with cmd_scope():
         contracts = ctr.contract.get_contracts_with_commercial()
         table = ctr.contract.get_table_with_headers(contracts, commercial=True)
@@ -26,7 +26,7 @@ def list_contract():
 @login_required
 @permission_required("CREATE_CONTRACT")
 def add_contract(client_id, amount):
-    """Créer un contrat"""
+    """Create a contract"""
     with cmd_scope():
         ctr.contract.add(client_id, amount)
         View.display_success("Contrat créé.")
@@ -37,7 +37,7 @@ def add_contract(client_id, amount):
 @login_required
 @owns_contrat_or_permission("UPDATE_CONTRACT")
 def update_contract(contract_id):
-    """Modifier un contrat"""
+    """Modify a client"""
     with cmd_scope():
         ctr.contract.exists(contract_id)
         contract = ctr.contract.get(contract_id, 'client')
@@ -87,7 +87,7 @@ def update_contract(contract_id):
 @login_required
 @permission_required("FILTER_CONTRACT")
 def filter_contract():
-    """Filtrer les contrats"""
+    """Filtered list of clients."""
     choices = {
         "1": "Contrats non signés",
         "2": "Contrats non payés",

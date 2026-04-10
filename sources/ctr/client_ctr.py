@@ -7,9 +7,11 @@ from sources.ress.context_manager import view_scope, transaction_scope
 
 class ClientCTR(BaseCTR):
     def __init__(self):
+        """Defines the name of the DAO associated with the model."""
         super().__init__("client")
 
     def get_table_with_headers(self, clients):
+        """Returns a tuple composed of the headers and rows of the table represented as a list."""
         table_data = []
         for client in clients:
             list = []
@@ -38,6 +40,7 @@ class ClientCTR(BaseCTR):
         return headers, table_data
 
     def add(self, first_name, last_name, email, phone_number, enterprise_id):
+        """Opens a session to add a new client."""
         self.validate_attribute("first_name", first_name)
         self.validate_attribute("last_name", last_name)
         self.validate_attribute("email", email)
@@ -54,14 +57,17 @@ class ClientCTR(BaseCTR):
             )
 
     def set_attribute_client(self, id_client, attribute, value):
+        """Validates a value for an attribute and updates it using the base method."""
         self.validate_attribute(attribute, value)
         self.set_attribute(id_client, attribute, value)
 
     def get_enterprise_name(self, client_id):
+        """Returns the client's company name."""
         client = self.get(client_id, "enterprise")
         return client.enterprise.name
 
     def validate_attribute(self, attribute, value):
+        """Validates the attribute value of the model."""
         match attribute:
             case "first_name":
                 Validators.valid_name(value, "first_name")
@@ -73,6 +79,7 @@ class ClientCTR(BaseCTR):
                 Validators.valid_phone_number(value)
 
     def get_clients_for_current_commercial(self):
+        """Returns all customers of a salesperson."""
         user_id = current_session.user_id
         with view_scope() as session:
             dao = DAO(session)

@@ -1,28 +1,28 @@
 class EpicEventsError(Exception):
-    """Classe de base pour toutes les erreurs spécifiques au CRM."""
+    """Base class for all CRM-specific errors."""
     pass
 
 
 class AuthError(EpicEventsError):
-    """Erreur liée à la connexion ou au token."""
+    """Error related to the connection or the token."""
     pass
 
 
 class DatabaseError(EpicEventsError):
-    """Erreur lors d'une opération sur la base de données."""
+    """Error during a database operation."""
     pass
 
 
 class FileError(EpicEventsError):
-    """Erreur lors d'une opération sur les fichiers."""
+    """Error during a file operation."""
     pass
 
 
 class FormError(EpicEventsError):
-    """Erreur lors d'une opération sur un formulaire."""
+    """Error during a form operation."""
     pass
 
 
 class NotFoundError(EpicEventsError):
-    """Erreur lorsque la recherche de revoi aucun enregsitrement."""
+    """Error when the search returns no records."""
     pass

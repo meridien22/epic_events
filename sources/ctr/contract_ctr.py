@@ -8,9 +8,11 @@ from sources.ress.context_manager import view_scope, transaction_scope
 
 class ContractCTR(BaseCTR):
     def __init__(self):
+        """Defines the name of the DAO associated with the model."""
         super().__init__("contract")
 
     def get_table_with_headers(self, contracts, commercial=False):
+        """Returns a tuple composed of the headers and rows of the table represented as a list."""
         table_data = []
         for contract in contracts:
             list = []
@@ -37,6 +39,7 @@ class ContractCTR(BaseCTR):
         return headers, table_data
 
     def add(self, client_id, remaining_amount):
+        """Opens a session to add a new contract."""
         self.validate_attribute("remaining_amount", remaining_amount)
         with transaction_scope() as session:
             dao = DAO(session)
@@ -49,16 +52,19 @@ class ContractCTR(BaseCTR):
             )
 
     def get_signature_status(self, contract):
+        """Returns the signature status as a yes/no text."""
         if contract.is_signed:
             return 'Oui'
         else:
             return 'Non'
 
     def set_attribute_contract(self, contract_id, attribute, value):
+        """Validates a value for an attribute and updates it using the base method."""
         self.validate_attribute(attribute, value)
         self.set_attribute(contract_id, attribute, value)
 
     def get_unassigned_contracts_for_current_commercial(self):
+        """Returns unsigned contracts from the salesperson."""
         user_id = current_session.user_id
         with view_scope() as session:
             dao = DAO(session)
@@ -66,12 +72,14 @@ class ContractCTR(BaseCTR):
             return contracts
 
     def get_contracts_with_commercial(self):
+        """Returns contracts from the salesperson."""
         with view_scope() as session:
             dao = DAO(session)
             contracts = dao.contract.get_contracts_with_commercial()
             return contracts
 
     def validate_attribute(self, attribute, value):
+        """Validates the attribute value of the model."""
         try:
             match attribute:
                 case "total_amount":

@@ -6,10 +6,12 @@ from sqlalchemy.orm import joinedload
 
 class EventDAO(BaseDAO):
     def __init__(self, session):
+        """Defines model and session."""
         super().__init__(session)
         self.model = Event
 
     def get_events_user(self, user_id):
+        """Returns events associated with a user."""
         query = select(Event)
         rel_attr = getattr(self.model, "support")
         query = query.options(joinedload(rel_attr))

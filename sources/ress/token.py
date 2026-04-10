@@ -7,6 +7,7 @@ from sources.ress.security import get_private_key_ssh, get_public_key_ssh
 
 
 class Session:
+    """Stores the user's session data."""
     def __init__(self):
         self.access_token = None
         self.refresh_token = None
@@ -21,6 +22,7 @@ current_session = Session()
 
 class Token:
     def generate_token_from_email_password(self, email, password):
+        """Generates a token from an email and a password."""
         with SessionLocal() as session:
             dao = DAO(session)
             user = dao.user.get_by_mail(email)
@@ -29,6 +31,7 @@ class Token:
             self.generate_token(user.id)
 
     def generate_token(self, id_user):
+        """Generates a token from a user ID."""
         with SessionLocal() as session:
             now = datetime.now(timezone.utc)
             dao = DAO(session)
@@ -69,11 +72,13 @@ class Token:
             return user
 
     def get_payload(self, token):
+        """Returns the payload of a token."""
         header_data = jwt.get_unverified_header(token)
         payload = jwt.decode(token, key=get_public_key_ssh(), algorithms=[header_data['alg'], ])
         return payload
 
     def is_valid_access_refresh(self):
+        """Checks if the token is valid by taking into account the refresh token."""
         try:
             self.is_valid(current_session.access_token, "access")
             return True
@@ -89,6 +94,7 @@ class Token:
                 raise FileError(str(file_error))
 
     def is_valid(self, token, type):
+        """Checks if the token is valid."""
         try:
             header_data = jwt.get_unverified_header(token)
             payload = jwt.decode(

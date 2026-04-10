@@ -10,7 +10,7 @@ from sources.ress.context_manager import cmd_scope
 @login_required
 @permission_required("CREATE_DEPARTMENT")
 def add_department(name):
-    """Ajouter un département."""
+    """Add a department."""
     with cmd_scope():
         ctr.department.add(name)
         View.display_success(f"Département '{name}' créé.")

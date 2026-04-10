@@ -8,9 +8,11 @@ from sources.ress.context_manager import view_scope, transaction_scope
 
 class EventCTR(BaseCTR):
     def __init__(self):
+        """Defines the name of the DAO associated with the model."""
         super().__init__("event")
 
     def get_table_with_headers(self, events):
+        """Returns a tuple composed of the headers and rows of the table represented as a list."""
         table_data = []
         for event in events:
             list = []
@@ -48,6 +50,7 @@ class EventCTR(BaseCTR):
         return headers, table_data
 
     def add(self, event_data):
+        """Opens a session to add a new event."""
         for key, value in event_data.items():
             self.validate_attribute(key, value)
         with transaction_scope() as session:
@@ -65,6 +68,7 @@ class EventCTR(BaseCTR):
             )
 
     def get_events_for_current_commercial(self):
+        """Returns to commercial events."""
         user_id = current_session.user_id
         with view_scope() as session:
             dao = DAO(session)
@@ -72,6 +76,7 @@ class EventCTR(BaseCTR):
             return events
 
     def get_type_event(self):
+        """Returns event types."""
         return {
             "1": "Partie",
             "2": "Business meeting",
@@ -79,10 +84,12 @@ class EventCTR(BaseCTR):
         }
 
     def set_attribute_event(self, event_id, attribute, value):
+        """Validates a value for an attribute and updates it using the base method."""
         self.validate_attribute(attribute, value)
         self.set_attribute(event_id, attribute, value)
 
     def validate_attribute(self, attribute, value):
+        """Validates the attribute value of the model."""
         try:
             match attribute:
                 case "name":

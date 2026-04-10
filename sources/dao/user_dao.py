@@ -5,6 +5,7 @@ from sqlalchemy import select
 
 class UserDAO(BaseDAO):
     def __init__(self, session):
+        """Defines model and session."""
         super().__init__(session)
         self.model = User
 

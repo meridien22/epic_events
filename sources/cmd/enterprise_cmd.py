@@ -10,7 +10,7 @@ from sources.ress.context_manager import cmd_scope
 @login_required
 @permission_required("CREATE_ENTERPRISE")
 def add_enterprise(name):
-    """Ajouter une entreprise."""
+    """Add an enterprise."""
     with cmd_scope():
         ctr.enterprise.add(name)
         View.display_success(f"Entreprise '{name}' créé.")

@@ -1,20 +1,5 @@
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker
-from private.parameter import parameter
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import select, exists
 from sqlalchemy.orm import joinedload
-
-engine = create_engine(
-    f'postgresql+psycopg2://epic_user:{parameter["password_db"]}@localhost:5432/epic_events',
-    echo=False
-)
-
-SessionLocal = sessionmaker(bind=engine)
-
-
-class Base(DeclarativeBase):
-    metadata = MetaData(schema="dev")
 
 
 class BaseDAO:
@@ -23,6 +8,10 @@ class BaseDAO:
         self.model = None
 
     def get_by_id(self, obj_id, *relationships):
+        """
+        Executes an SQL query to retrieve all records from the table.
+        Loads any relationships that exist.
+        """
         query = select(self.model)
         for rel_name in relationships:
             rel_attr = getattr(self.model, rel_name)
@@ -31,6 +20,10 @@ class BaseDAO:
         return self.session.execute(query).scalar_one_or_none()
 
     def get_all(self, *relationships):
+        """
+        Executes an SQL query to retrieve an object from the model using its identifier.
+        Loads any relationships that exist.
+        """
         query = select(self.model)
         for rel_name in relationships:
             rel_attr = getattr(self.model, rel_name)
@@ -38,6 +31,10 @@ class BaseDAO:
         return self.session.execute(query).scalars().all()
 
     def filter_by_attribute_egal(self, attr_name, value, *relationships):
+        """
+        Executes a query to return objects from a model
+        based on an equality relationship between an attribute and a value.
+        """
         column = getattr(self.model, attr_name)
         query = select(self.model)
         for rel_name in relationships:
@@ -51,6 +48,10 @@ class BaseDAO:
         return self.session.execute(query).scalars().all()
 
     def filter_by_attribute_not_egal(self, attr_name, value, *relationships):
+        """
+        Executes a query to return objects from a model
+        based on an inequality relationship between an attribute and a value.
+        """
         column = getattr(self.model, attr_name)
         query = select(self.model)
         for rel_name in relationships:
@@ -63,20 +64,19 @@ class BaseDAO:
                 query = query.where(column != value)
         return self.session.execute(query).scalars().all()
 
-    def save(self, obj):
-        self.session.add(obj)
-        return obj
-
     def delete(self, obj):
+        """Removes an object from the model."""
         if obj:
             self.session.delete(obj)
 
     def create(self, **data):
+        """Creates a new object from a dictionary and adds it to the database."""
         new_obj = self.model(**data)
         self.session.add(new_obj)
         return new_obj
 
     def exists(self, obj_id):
+        """Tests if an object with a given identifier exists in the database."""
         query = select(exists().where(self.model.id == obj_id))
         result = self.session.execute(query).scalar()
         return result
