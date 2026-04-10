@@ -1,7 +1,7 @@
 from sources.dao.base_dao import BaseDAO
 from sources.ress.models import User
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
+
 
 class UserDAO(BaseDAO):
     def __init__(self, session):
@@ -11,7 +11,7 @@ class UserDAO(BaseDAO):
     def get_by_mail(self, email):
         query = select(User).where(User.email == email)
         return self.session.execute(query).scalar_one_or_none()
-    
+
     def create(self, **data):
         password = data.pop('password', None)
         new_user = self.model(**data)

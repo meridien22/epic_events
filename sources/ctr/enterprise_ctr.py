@@ -1,9 +1,8 @@
 from sources.dao import DAO
 from sources.ctr.base_ctr import BaseCTR
-from sources.ress.exceptions import DatabaseError, FormError
-from sqlalchemy.exc import IntegrityError
 from sources.ress.validators import Validators
 from sources.ress.context_manager import transaction_scope
+
 
 class EnterpriseCTR(BaseCTR):
     def __init__(self):
@@ -11,6 +10,6 @@ class EnterpriseCTR(BaseCTR):
 
     def add(self, name):
         with transaction_scope() as session:
-            Validators.string_len(name,"nom",3, 50)
+            Validators.string_len(name, "nom", 3, 50)
             dao = DAO(session)
             dao.enterprise.create(name=name)

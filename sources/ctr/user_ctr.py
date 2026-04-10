@@ -24,7 +24,7 @@ class UserCTR(BaseCTR):
                 password=password
             )
 
-    def get_table_with_headers(self, users): 
+    def get_table_with_headers(self, users):
         table_data = []
         for user in users:
             list = []
@@ -48,18 +48,18 @@ class UserCTR(BaseCTR):
         from sources.ctr import ctr
         user = ctr.user.get(id_user, "department")
         return user.department.name
-            
+
     def set_attribute_user(self, user_id, attribute, value):
-            self.validate_attribute(attribute, value)
-            self.set_attribute(user_id, attribute, value)
+        self.validate_attribute(attribute, value)
+        self.set_attribute(user_id, attribute, value)
 
     def validate_attribute(self, attribute, value):
         try:
             match attribute:
                 case "first_name":
-                    Validators.string_len(value,"prénom",0, 50)
+                    Validators.string_len(value, "prénom", 0, 50)
                 case "last_name":
-                    Validators.string_len(value,"nom",0, 50)
+                    Validators.string_len(value, "nom", 0, 50)
                 case "email":
                     Validators.email(value)
                 case "password":

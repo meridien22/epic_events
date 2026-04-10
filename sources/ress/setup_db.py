@@ -4,11 +4,12 @@ from sources.dao.base_dao import SessionLocal
 from private.parameter import parameter
 from sqlalchemy import select, text
 
+
 def init_db():
     Base.metadata.create_all(engine)
 
     with SessionLocal() as session:
-        
+
         # Mise à zéro de la base de donnée
         tables = [
             "event",
@@ -24,15 +25,15 @@ def init_db():
         ]
         for table in tables:
             session.execute(text(f"TRUNCATE TABLE dev.{table} RESTART IDENTITY CASCADE;"))
-        
+
         # Ajout des départements
-        departments=['Sales', 'Support', 'Management', 'Admin']
+        departments = ['Sales', 'Support', 'Management', 'Admin']
         for department in departments:
             dept = Department(name=department)
             session.add(dept)
 
         # Ajout des permissions génériques
-        permissions=[
+        permissions = [
             "SELECT_CLIENT",
             "SELECT_CONTRACT",
             "SELECT_EVENT",
@@ -45,7 +46,7 @@ def init_db():
 
         # Ajout des premissions par département
         department = session.query(Department).filter_by(name='Sales').first()
-        permissions=[
+        permissions = [
             "CREATE_CLIENT",
             "UPDATE_MY_CLIENT",
             "UPDATE_CONTRACT",
@@ -58,7 +59,7 @@ def init_db():
             department.permissions.append(permission)
 
         department = session.query(Department).filter_by(name='Support').first()
-        permissions=[
+        permissions = [
             "FILTER_EVENT",
             "UPDATE_MY_EVENT",
         ]
@@ -67,7 +68,7 @@ def init_db():
             department.permissions.append(permission)
 
         department = session.query(Department).filter_by(name='Management').first()
-        permissions=[
+        permissions = [
             "SELECT_USER",
             "CREATE_USER",
             "UPDATE_USER",
@@ -82,7 +83,7 @@ def init_db():
             department.permissions.append(permission)
 
         department = session.query(Department).filter_by(name='Admin').first()
-        permissions=[
+        permissions = [
             "CREATE_DEPARTMENT",
             "ADD_SUPPORT_TO_EVENT",
             "CREATE_CLIENT",
@@ -105,7 +106,7 @@ def init_db():
         for permission_name in permissions:
             permission = Permission(name=permission_name)
             department.permissions.append(permission)
-        
+
         # Ajout des utilisateurs
         query = select(Department.id).where(Department.name == "Support")
         department_support_id = session.execute(query).scalar()
@@ -163,31 +164,30 @@ def init_db():
         ]
         for client_param in clients:
             client = Client(
-                first_name = client_param[0],
-                last_name = client_param[1],
-                email = client_param[2],
-                phone_number = client_param[3],
-                enterprise_id = client_param[4],
-                commercial_id = client_param[5],
+                first_name=client_param[0],
+                last_name=client_param[1],
+                email=client_param[2],
+                phone_number=client_param[3],
+                enterprise_id=client_param[4],
+                commercial_id=client_param[5],
             )
             session.add(client)
 
         # Ajout des contrats
         query = select(Client.id).where(Client.first_name == "Marcel")
         client_id = session.execute(query).scalar()
-        contracts =[
+        contracts = [
             [50000, 25000, 1, client_id],
             [0, 0, 0, client_id],
         ]
         for contratc_param in contracts:
             contract = Contract(
-                total_amount = contratc_param[0],
-                remaining_amount = contratc_param[1],
-                is_signed = contratc_param[2],
-                client_id = contratc_param[3],
+                total_amount=contratc_param[0],
+                remaining_amount=contratc_param[1],
+                is_signed=contratc_param[2],
+                client_id=contratc_param[3],
             )
             session.add(contract)
-
 
         # Ajout des lieux
         locations = [
@@ -198,10 +198,10 @@ def init_db():
         ]
         for location_param in locations:
             location = Location(
-                street = location_param[0],
-                postal_code = location_param[1],
-                city = location_param[2],
-                country = location_param[3],
+                street=location_param[0],
+                postal_code=location_param[1],
+                city=location_param[2],
+                country=location_param[3],
             )
             session.add(location)
 
@@ -217,18 +217,15 @@ def init_db():
         ]
         for event_param in events:
             event = Event(
-                name = event_param[0],
-                type_event = event_param[1],
-                expected_audience = event_param[2],
-                contract_id =event_param[3],
-                support_id = event_param[4],
-                location_id = event_param[5],
-                date_start = event_param[6],
-                date_end = event_param[7],
+                name=event_param[0],
+                type_event=event_param[1],
+                expected_audience=event_param[2],
+                contract_id=event_param[3],
+                support_id=event_param[4],
+                location_id=event_param[5],
+                date_start=event_param[6],
+                date_end=event_param[7],
             )
             session.add(event)
 
         session.commit()
-
-if __name__ == "__main__":
-    init_db()

@@ -5,16 +5,19 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from sources.ress.security import get_private_key_ssh, get_public_key_ssh
 
+
 class Session:
     def __init__(self):
         self.access_token = None
         self.refresh_token = None
         self.user_id = None
         self.department_id = None
-        self.first_name= None
+        self.first_name = None
         self.last_name = None
 
+
 current_session = Session()
+
 
 class Token:
     def generate_token_from_email_password(self, email, password):
@@ -37,7 +40,7 @@ class Token:
                 "type": "access",
                 "department": user.department.id
             }
-            
+
             refresh_payload = {
                 "sub": str(id_user),
                 "exp": now + timedelta(days=0.5),
@@ -61,21 +64,20 @@ class Token:
             current_session.user_id = id_user
             current_session.department_id = user.department.id
             current_session.first_name = user.first_name
-            current_session.last_name= user.last_name
+            current_session.last_name = user.last_name
 
             return user
-        
+
     def get_payload(self, token):
         header_data = jwt.get_unverified_header(token)
         payload = jwt.decode(token, key=get_public_key_ssh(), algorithms=[header_data['alg'], ])
         return payload
 
-
     def is_valid_access_refresh(self):
         try:
             self.is_valid(current_session.access_token, "access")
             return True
-        except AuthError as e:
+        except AuthError:
             try:
                 self.is_valid(current_session.refresh_token, "refresh")
                 payload = self.get_payload(current_session.refresh_token)
@@ -91,7 +93,7 @@ class Token:
             header_data = jwt.get_unverified_header(token)
             payload = jwt.decode(
                 token,
-                key=get_public_key_ssh(), 
+                key=get_public_key_ssh(),
                 algorithms=[header_data['alg'], ]
             )
             # on vérifie le type du token pour éviter d'utiliser un refresh à la place d'un access
@@ -106,7 +108,8 @@ class Token:
             return True
         except jwt.ExpiredSignatureError:
             raise AuthError("Token expiré.")
-        except Exception as error:
+        except Exception:
             raise AuthError("Token invalide.")
+
 
 token = Token()

@@ -1,4 +1,4 @@
-from sources.ress.setup_db import init_db
+# from sources.ress.setup_db import init_db
 import click
 from sources.cmd.department_cmd import add_department
 from sources.cmd.user_cmd import (
@@ -32,6 +32,7 @@ from sources.ress.view import View
 
 # init_db()
 
+
 @click.group()
 def cli():
     click.clear()
@@ -40,6 +41,7 @@ def cli():
     View.display_separation_line()
     View.display_parameter(read_user_from_token())
     View.display_separation_line()
+
 
 cli.add_command(login)
 cli.add_command(add_user)
@@ -65,4 +67,3 @@ cli.add_command(filter_event)
 cli.add_command(add_support)
 cli.add_command(add_event)
 cli.add_command(update_event)
-

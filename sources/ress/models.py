@@ -15,7 +15,6 @@ from sqlalchemy.orm import (
 )
 
 from sqlalchemy import (
-
     Integer,
     String,
     Date,
@@ -36,6 +35,7 @@ departement_permissions = Table(
     Column("department_id", ForeignKey("department.id"), primary_key=True),
     Column("permission_id", ForeignKey("permission.id"), primary_key=True),
 )
+
 
 class Permission(Base):
     __tablename__ = 'permission'
@@ -69,7 +69,7 @@ class Department(Base):
     )
 
     def __str__(self):
-         return f"{self.name} ({self.id})"
+        return f"{self.name} ({self.id})"
 
 
 class Session(Base):
@@ -106,16 +106,16 @@ class User(Base):
     )
 
     def set_password(self, password):
-            self.password = argon2.hash(password)
+        self.password = argon2.hash(password)
 
     def check_password(self, password):
-            try:
-                return argon2.verify(password, self.password)
-            except Exception:
-                return False
-            
+        try:
+            return argon2.verify(password, self.password)
+        except Exception:
+            return False
+
     def __str__(self):
-         return f"{self.first_name} {self.last_name} ({self.id})"
+        return f"{self.first_name} {self.last_name} ({self.id})"
 
 
 class Enterprise(Base):
@@ -131,7 +131,7 @@ class Enterprise(Base):
     )
 
     def __str__(self):
-         return f"{self.name} ({self.id})"
+        return f"{self.name} ({self.id})"
 
 
 class Client(Base):
@@ -145,8 +145,7 @@ class Client(Base):
     date_creation: Mapped[date] = mapped_column(Date, default=date.today)
     date_update: Mapped[datetime] = mapped_column(DateTime,
                                                   default=datetime.now,
-                                                  onupdate=datetime.now
-    )
+                                                  onupdate=datetime.now)
 
     contracts: Mapped[List["Contract"]] = relationship(back_populates="client")
 
@@ -161,8 +160,7 @@ class Client(Base):
     )
 
     def __str__(self):
-         return f"{self.first_name} {self.last_name} ({self.id})"
-
+        return f"{self.first_name} {self.last_name} ({self.id})"
 
 
 class Contract(Base):
@@ -180,7 +178,7 @@ class Contract(Base):
     event: Mapped[Optional["Event"]] = relationship(back_populates="contract")
 
     def __str__(self):
-         return f"{self.total_amount} {self.date_creation} ({self.id})"
+        return f"{self.total_amount} {self.date_creation} ({self.id})"
 
 
 class Event(Base):
@@ -203,7 +201,6 @@ class Event(Base):
     location_id: Mapped[int] = mapped_column(ForeignKey("location.id"))
     location: Mapped["Location"] = relationship(back_populates="events")
 
-
     __table_args__ = (
         CheckConstraint(
             "type_event IN ('Partie', 'Business meeting', 'Off-site event')",
@@ -224,4 +221,4 @@ class Location(Base):
     events: Mapped[List["Event"]] = relationship(back_populates="location")
 
     def __str__(self):
-         return f"{self.street} {self.postal_code} {self.city} {self.country} ({self.id}) "
+        return f"{self.street} {self.postal_code} {self.city} {self.country} ({self.id}) "

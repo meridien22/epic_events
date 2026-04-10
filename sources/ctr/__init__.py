@@ -6,6 +6,7 @@ from .event_ctr import EventCTR
 from .location_ctr import LocationCTR
 from .user_ctr import UserCTR
 
+
 class CTR:
     def __init__(self):
         self.client = ClientCTR()
@@ -15,5 +16,6 @@ class CTR:
         self.event = EventCTR()
         self.location = LocationCTR()
         self.user = UserCTR()
+
 
 ctr = CTR()

@@ -3,6 +3,8 @@ from sources.ress.view import View
 from sources.ress.authorisation import login_required, permission_required, owns_contrat_or_permission
 from sources.ctr import ctr
 from sources.ress.context_manager import cmd_scope
+import sentry_sdk
+
 
 @click.command()
 @login_required
@@ -11,13 +13,14 @@ def list_contract():
     """Lister les contrats."""
     with cmd_scope():
         contracts = ctr.contract.get_contracts_with_commercial()
-        table = ctr.contract.get_table_with_headers(contracts, commercial = True)
+        table = ctr.contract.get_table_with_headers(contracts, commercial=True)
         View.display_table("Liste des contrats", table[0], table[1])
+
 
 @click.command()
 @click.argument('client_id', type=click.INT)
 @click.argument(
-    'amount', 
+    'amount',
     type=click.FloatRange(min=0.01, clamp=False)
 )
 @login_required
@@ -26,7 +29,8 @@ def add_contract(client_id, amount):
     """Créer un contrat"""
     with cmd_scope():
         ctr.contract.add(client_id, amount)
-        View.display_success(f"Contrat créé.")
+        View.display_success("Contrat créé.")
+
 
 @click.command()
 @click.argument('contract_id', type=click.INT)
@@ -66,6 +70,9 @@ def update_contract(contract_id):
                     "1": True,
                     "0": False,
                 }
+                if values_db[choice]:
+                    message = f"CONTRACT SIGNED : Nouveau contrat signé ({contract_id})"
+                    sentry_sdk.capture_message(message, level="info")
                 choice = View.display_prompt_choices("Etat signature", values_user)
                 new_value = values_db[choice]
             case 'client_id':
@@ -74,6 +81,7 @@ def update_contract(contract_id):
                 new_value = View.display_prompt_choices('Choix du client', choices)
         ctr.contract.set_attribute_contract(contract_id, attribute, new_value)
         View.display_success(f"Champ {attribute} modifié.")
+
 
 @click.command()
 @login_required

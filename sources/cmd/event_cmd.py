@@ -5,6 +5,7 @@ from sources.ress.authorisation import login_required, permission_required, owns
 from sources.ctr import ctr
 from sources.ress.context_manager import cmd_scope
 
+
 @click.command()
 @login_required
 @permission_required("SELECT_EVENT")
@@ -14,6 +15,7 @@ def list_event():
         events = ctr.event.get_all("support", "location")
         table = ctr.event.get_table_with_headers(events)
         View.display_table("Liste des événements", table[0], table[1])
+
 
 @click.command()
 @login_required
@@ -37,6 +39,7 @@ def filter_event():
         else:
             View.display_table("Liste des contrats", table[0], table[1])
 
+
 @click.command()
 @click.argument('event_id', type=click.INT)
 @login_required
@@ -54,6 +57,7 @@ def add_support(event_id):
         ctr.event.set_attribute(event_id, "support_id", choice)
         View.display_success("Support attribué à l'événement")
 
+
 @click.command()
 @click.argument('name', type=click.STRING)
 @login_required
@@ -64,12 +68,12 @@ def add_event(name):
         contracts = ctr.contract.get_unassigned_contracts_for_current_commercial()
         if not contracts:
             raise NotFoundError("Aucun contrat pour associer l'événement.")
-        
+
         event_data = {"name": name}
 
         choices = ctr.contract.get_dict_for_choices_from_records(contracts)
         event_data['contract_id'] = View.display_prompt_choices('Choix du contrat', choices)
-   
+
         departments = ctr.department.get_attribute_egal("name", "Support")
         department_id = departments[0].id
         users_support = ctr.user.get_attribute_egal("department_id", department_id)
@@ -92,7 +96,8 @@ def add_event(name):
         event_data['note'] = View.display_prompt_note("Note")
 
         ctr.event.add(event_data)
-        View.display_success(f"Evénement créé.")
+        View.display_success("Evénement créé.")
+
 
 @click.command()
 @click.argument('event_id', type=click.INT)

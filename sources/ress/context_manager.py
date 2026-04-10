@@ -4,8 +4,8 @@ from sources.dao.base_dao import SessionLocal
 from sources.ress.view import View
 import sentry_sdk
 from private.parameter import parameter
-from sources.ress.exceptions import (EpicEventsError, DatabaseError, FormError, 
-    AuthError, FileError, NotFoundError)
+from sources.ress.exceptions import (EpicEventsError, DatabaseError, FormError,
+                                     AuthError, FileError, NotFoundError)
 import sys
 
 sentry_sdk.init(
@@ -15,6 +15,7 @@ sentry_sdk.init(
     send_default_pii=True,
 )
 
+
 @contextmanager
 def transaction_scope():
     """Gère le cycle de vie d'une transaction SQL avec gestion d'erreurs."""
@@ -22,17 +23,18 @@ def transaction_scope():
     try:
         yield session
         session.commit()
-    except IntegrityError as e:
+    except IntegrityError:
         session.rollback()
         raise DatabaseError("Donnée déjà existante ou non autorisé.")
     except EpicEventsError as e:
         session.rollback()
         raise e
-    except Exception as e:
+    except Exception:
         session.rollback()
         raise DatabaseError("Une erreur inattendue est survenue.")
     finally:
         session.close()
+
 
 @contextmanager
 def view_scope():
@@ -47,6 +49,7 @@ def view_scope():
     finally:
         session.close()
 
+
 ERROR_LABELS = {
     "DatabaseError": "ERREUR SQL",
     "FormError": "SAISIE INCORRECTE",
@@ -54,6 +57,7 @@ ERROR_LABELS = {
     "FileError": "ERREUR FICHIER",
     "NotFoundError": "ECHEC RECHERCHE",
 }
+
 
 @contextmanager
 def auth_scope():
@@ -68,7 +72,7 @@ def auth_scope():
         sentry_sdk.capture_exception(e)
         sys.exit()
     except Exception as e:
-        View.display_error(f"[ERREUR CRITIQUE] : Une erreur inattendue est survenue.")
+        View.display_error("[ERREUR CRITIQUE] : Une erreur inattendue est survenue.")
         sentry_sdk.capture_exception(e)
 
 
@@ -87,7 +91,6 @@ def cmd_scope():
         friendly_name = ERROR_LABELS.get(class_name, class_name)
         View.display_info(f"[{friendly_name}] : {str(e)}")
     except AuthError as e:
-        # sentry_sdk.capture_exception(e)
         class_name = e.__class__.__name__
         friendly_name = ERROR_LABELS.get(class_name, class_name)
         View.display_error(f"[{friendly_name}] : {str(e)}")
@@ -101,5 +104,5 @@ def cmd_scope():
         friendly_name = ERROR_LABELS.get(class_name, class_name)
         View.display_info(f"[{friendly_name}] : {str(e)}")
     except Exception as e:
-        View.display_error(f"[ERREUR CRITIQUE] : Une erreur inattendue est survenue.")
+        View.display_error("[ERREUR CRITIQUE] : Une erreur inattendue est survenue.")
         sentry_sdk.capture_exception(e)

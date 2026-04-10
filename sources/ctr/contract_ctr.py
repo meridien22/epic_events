@@ -5,11 +5,12 @@ from sources.ress.validators import Validators
 from sources.ress.token import current_session
 from sources.ress.context_manager import view_scope, transaction_scope
 
+
 class ContractCTR(BaseCTR):
     def __init__(self):
         super().__init__("contract")
- 
-    def get_table_with_headers(self, contracts, commercial = False):
+
+    def get_table_with_headers(self, contracts, commercial=False):
         table_data = []
         for contract in contracts:
             list = []
@@ -35,7 +36,6 @@ class ContractCTR(BaseCTR):
             headers . append("Commercial")
         return headers, table_data
 
-
     def add(self, client_id, remaining_amount):
         self.validate_attribute("remaining_amount", remaining_amount)
         with transaction_scope() as session:
@@ -53,18 +53,18 @@ class ContractCTR(BaseCTR):
             return 'Oui'
         else:
             return 'Non'
-        
+
     def set_attribute_contract(self, contract_id, attribute, value):
         self.validate_attribute(attribute, value)
         self.set_attribute(contract_id, attribute, value)
-            
+
     def get_unassigned_contracts_for_current_commercial(self):
         user_id = current_session.user_id
         with view_scope() as session:
             dao = DAO(session)
             contracts = dao.contract.get_unassigned_contracts_for_commercial(user_id)
             return contracts
-        
+
     def get_contracts_with_commercial(self):
         with view_scope() as session:
             dao = DAO(session)

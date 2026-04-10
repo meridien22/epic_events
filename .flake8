@@ -1,0 +1,17 @@
+[flake8]
+
+# Définit la longueur maximale des lignes
+max-line-length = 119
+
+# Spécifie les fichiers ou répertoires à exclure de l'analyse
+exclude =
+    .gitignore,
+    .venv,
+    .vscode,
+    data,
+    private,
+    .env,
+    .flake8,
+    poetry.lock,
+    pyproject.toml,
+    script_test.py

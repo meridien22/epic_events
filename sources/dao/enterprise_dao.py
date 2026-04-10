@@ -1,6 +1,5 @@
 from sources.dao.base_dao import BaseDAO
 from sources.ress.models import Enterprise
-from sqlalchemy import select
 
 
 class EnterpriseDAO(BaseDAO):

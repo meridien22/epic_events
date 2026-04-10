@@ -4,6 +4,7 @@ from sources.ress.authorisation import login_required, permission_required
 from sources.ctr import ctr
 from sources.ress.context_manager import cmd_scope
 
+
 @click.command()
 @click.argument('name', type=click.STRING)
 @login_required

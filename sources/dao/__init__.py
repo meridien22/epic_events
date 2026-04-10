@@ -6,6 +6,7 @@ from .enterprise_dao import EnterpriseDAO
 from .contract_dao import ContractDAO
 from .location_dao import LocationDAO
 
+
 class DAO:
     def __init__(self, session):
         self.session = session

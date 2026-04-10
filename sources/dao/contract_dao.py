@@ -1,13 +1,14 @@
 from sources.dao.base_dao import BaseDAO
-from sources.ress.models import Contract, Client, Event, User
+from sources.ress.models import Contract, Client, Event
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload
+
 
 class ContractDAO(BaseDAO):
     def __init__(self, session):
         super().__init__(session)
         self.model = Contract
-    
+
     def get_unassigned_contracts_for_commercial(self, user_id):
         """
         Retourne les contrats qui n'ont pas encore d'événement associé.
@@ -22,7 +23,7 @@ class ContractDAO(BaseDAO):
             .where(~Contract.id.in_(subquery))
         )
         return self.session.execute(query).scalars().all()
-    
+
     def get_contracts_with_commercial(self):
         """
         Retourne les contrats avec le nom du client et du commercial.
@@ -31,7 +32,7 @@ class ContractDAO(BaseDAO):
         query = (
             select(Contract)
             .join(Contract.client)
-            .join(Client.commercial) 
+            .join(Client.commercial)
             .options(
                 joinedload(Contract.client).joinedload(Client.commercial)
             )

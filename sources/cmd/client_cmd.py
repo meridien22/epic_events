@@ -4,6 +4,7 @@ from sources.ress.authorisation import login_required, permission_required, owns
 from sources.ctr import ctr
 from sources.ress.context_manager import cmd_scope
 
+
 @click.command()
 @login_required
 @permission_required("SELECT_CLIENT")
@@ -14,6 +15,7 @@ def list_client():
         table = ctr.client.get_table_with_headers(clients)
         View.display_table("Liste des clients", table[0], table[1])
 
+
 @click.command()
 @click.argument('first_name', type=click.STRING)
 @click.argument('last_name', type=click.STRING)
@@ -21,13 +23,14 @@ def list_client():
 @permission_required("CREATE_CLIENT")
 def add_client(first_name, last_name):
     """Ajouter un client."""
-    email = View.display_prompt_string(f"Email du client")
-    phone_number = View.display_prompt_string(f"Téléphone du client")
+    email = View.display_prompt_string("Email du client")
+    phone_number = View.display_prompt_string("Téléphone du client")
     with cmd_scope():
         choices = ctr.enterprise.get_dict_for_choices()
         enterprise_id = View.display_prompt_choices("Entreprises disponibles", choices)
         ctr.client.add(first_name, last_name, email, phone_number, enterprise_id)
         View.display_success(f"Client {first_name}  {last_name} créé.")
+
 
 @click.command()
 @click.argument('client_id', type=click.INT)

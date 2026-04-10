@@ -6,7 +6,6 @@ from sources.ress.token import current_session
 from sources.ress.context_manager import view_scope, transaction_scope
 
 
-
 class EventCTR(BaseCTR):
     def __init__(self):
         super().__init__("event")
@@ -24,9 +23,9 @@ class EventCTR(BaseCTR):
             list.append(event.note)
             list.append(event.contract_id)
             if event.support is not None:
-                list.append(f"{event.support.first_name} {event.support.last_name}")
+                list.append("{event.support.first_name} {event.support.last_name}")
             else:
-                list.append(f"Aucun support")
+                list.append("Aucun support")
             street = event.location.street
             code = event.location.postal_code
             city = event.location.city
@@ -54,17 +53,16 @@ class EventCTR(BaseCTR):
         with transaction_scope() as session:
             dao = DAO(session)
             dao.event.create(
-                name = event_data["name"],
-                contract_id = event_data["contract_id"],
-                support_id = event_data["support_id"],
-                location_id = event_data["location_id"],
-                type_event = event_data["type_event"],
-                date_start = event_data["date_start"],
-                date_end = event_data["date_end"],
-                expected_audience = event_data["expected_audience"],
-                note = event_data["note"],
+                name=event_data["name"],
+                contract_id=event_data["contract_id"],
+                support_id=event_data["support_id"],
+                location_id=event_data["location_id"],
+                type_event=event_data["type_event"],
+                date_start=event_data["date_start"],
+                date_end=event_data["date_end"],
+                expected_audience=event_data["expected_audience"],
+                note=event_data["note"],
             )
-
 
     def get_events_for_current_commercial(self):
         user_id = current_session.user_id
@@ -72,14 +70,14 @@ class EventCTR(BaseCTR):
             dao = DAO(session)
             events = dao.event.get_events_user(user_id)
             return events
-        
+
     def get_type_event(self):
         return {
             "1": "Partie",
             "2": "Business meeting",
             "3": "Off-site event"
         }
-    
+
     def set_attribute_event(self, event_id, attribute, value):
         self.validate_attribute(attribute, value)
         self.set_attribute(event_id, attribute, value)
@@ -88,8 +86,8 @@ class EventCTR(BaseCTR):
         try:
             match attribute:
                 case "name":
-                    Validators.string_len(value,"nom",0, 50)
+                    Validators.string_len(value, "nom", 0, 50)
                 case "expected_audience":
-                    Validators.valid_number_positive(value,"audience")
+                    Validators.valid_number_positive(value, "audience")
         except FormError as e:
             raise e

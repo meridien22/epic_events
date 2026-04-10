@@ -50,27 +50,23 @@ class ClientCTR(BaseCTR):
                 email=email,
                 phone_number=phone_number,
                 enterprise_id=enterprise_id,
-                commercial_id = current_session.user_id,
+                commercial_id=current_session.user_id,
             )
 
-
-    def set_attribute_client(self, id_client, attribute, value): 
+    def set_attribute_client(self, id_client, attribute, value):
         self.validate_attribute(attribute, value)
         self.set_attribute(id_client, attribute, value)
- 
 
     def get_enterprise_name(self, client_id):
-        with view_scope() as session:
-            dao = DAO(session)
-            client = self.get(client_id, "enterprise")
-            return client.enterprise.name
-        
+        client = self.get(client_id, "enterprise")
+        return client.enterprise.name
+
     def validate_attribute(self, attribute, value):
         match attribute:
             case "first_name":
-                Validators.valid_name(value,"first_name")
+                Validators.valid_name(value, "first_name")
             case "last_name":
-                Validators.valid_name(value,"last_name")
+                Validators.valid_name(value, "last_name")
             case "email":
                 Validators.email(value)
             case "phone_number":

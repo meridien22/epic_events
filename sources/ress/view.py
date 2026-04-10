@@ -39,7 +39,7 @@ class View:
     def display_separation_line():
         click.echo("-" * 63)
 
-    @staticmethod    
+    @staticmethod
     def get_choice_dict(dict_):
         choices = []
         for key in dict_:
@@ -54,7 +54,7 @@ class View:
             type=click.Choice(choices.keys()),
             show_choices=False
         )
-    
+
     @staticmethod
     def display_prompt_date(title):
         return click.prompt(
@@ -68,7 +68,7 @@ class View:
             title,
             type=click.INT
         )
-    
+
     @staticmethod
     def display_prompt_note(title):
         return click.prompt(
@@ -77,7 +77,7 @@ class View:
             default="",
             show_default=False
         )
-    
+
     @staticmethod
     def display_prompt_string(title):
         return click.prompt(

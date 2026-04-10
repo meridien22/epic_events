@@ -1,11 +1,11 @@
 from sources.ress.token import current_session, token
 from functools import wraps
 from decouple import config
-from sources.dao.base_dao import SessionLocal
 from sources.dao import DAO
 from sources.ress.view import View
 from sources.ress.exceptions import AuthError
 from sources.ress.context_manager import auth_scope
+
 
 def login_required(f):
     """Gestion de l'authentification"""
@@ -24,6 +24,7 @@ def login_required(f):
             return f(*args, **kwargs)
     return wrapper
 
+
 def read_user_from_token():
     with auth_scope() as session:
         current_session.access_token = config("EPIC_EVENTS_ACCESS_TOKEN", default=None)
@@ -32,13 +33,14 @@ def read_user_from_token():
             return 'Aucun utilisateur connecté'
         try:
             token.is_valid_access_refresh()
-        except:
+        except Exception:
             return 'Aucun utilisateur connecté'
         # si le token est valide, on récupère le user
         payload = token.get_payload(current_session.access_token)
         dao = DAO(session)
         user = dao.user.get_by_id(payload.get('sub'))
         return (f'Utilisateur connecté : {user.first_name} {user.last_name} ({user.department.name})')
+
 
 def permission_required(permission):
     """Gestion des autorisations"""
@@ -56,6 +58,7 @@ def permission_required(permission):
         return wrapper
     return decorator
 
+
 def owns_event(f):
     """Gestion de l'Object Access sur event"""
     @wraps(f)
@@ -71,10 +74,12 @@ def owns_event(f):
             # on vérifie que l'utilisateur est bien le support de l'event
             event = dao.event.get_by_id(event_id)
             if not event.support_id == current_session.user_id:
-                View.display_info("Accès refusé : vous devez être le gestionnaire de l'événement pour pouvoir le modifier.")
+                messsage = "Accès refusé : vous devez être le gestionnaire de l'événement pour pouvoir le modifier."
+                View.display_info(messsage)
                 return
         return f(*args, **kwargs)
     return wrapper
+
 
 def owns_client(f):
     """Gestion de l'Object Access sur client"""
@@ -95,6 +100,7 @@ def owns_client(f):
                 return
         return f(*args, **kwargs)
     return wrapper
+
 
 def owns_contrat_or_permission(permission):
     """Gestion des autorisations"""
@@ -132,32 +138,10 @@ def owns_contrat_or_permission(permission):
                     access = True
                 if department_name == 'Sales' and has_permission and is_owner:
                     access = True
-                
+
                 if not access:
                     View.display_info("Accès refusé : vous n'êtes pas autorisé à modifier ce contrat.")
                     return
             return f(*args, **kwargs)
         return wrapper
     return decorator
-
-def owns_event(f):
-    """
-    Gestion de l'Object Access sur event
-    """
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        with auth_scope() as session:
-            # click ajouter les paramètres de la commande comme des arguments de la fonction
-            event_id = kwargs.get('event_id')
-            # on vérifie si le client existe dans la base
-            dao = DAO(session)
-            if not dao.event.exists(event_id):
-                View.display_info("Evenement inconnu dans la base.")
-                return
-            # on vérifie que l'utilisateur est bien le support de l'event
-            event = dao.event.get_by_id(event_id)
-            if not event.support_id == int(current_session.user_id):
-                View.display_info("Accès refusé : vous devez être support de l'événement pour pouvoir le modifier.")
-                return
-        return f(*args, **kwargs)
-    return wrapper
