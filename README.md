@@ -12,4 +12,4 @@ Etapes à suivre pour installer localement l'application :
     * `curl -sSL https://install.python-poetry.org | python3 -`
 4. **Créer l'environnement virtuel et installer les bilbiothèques**
     * `poetry config virtualenvs.in-project true`
-    * `poetry install`
+    * `poetry install --no-root`
