@@ -1,5 +1,8 @@
 import click
 from tabulate import tabulate
+import logging
+import os
+import sys
 
 
 class View:
@@ -98,3 +101,16 @@ class View:
             title,
             type=click.STRING
         )
+    
+    @staticmethod
+    def log(message = None, pause = False, exit = False):
+        format = '%(levelname)s: %(filename)s (ligne %(lineno)d): %(message)s'
+        logging.basicConfig(format=format, level=logging.DEBUG, force=True)
+        if message is None:
+            logging.debug("", stacklevel=2)
+        else :
+            logging.debug(message, stacklevel=2)
+        if pause :
+            os.system("pause")
+        if exit:
+            sys.exit()

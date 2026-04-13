@@ -4,6 +4,7 @@ from datetime import date, datetime
 from passlib.hash import argon2
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import MetaData
+from private.parameter import parameter
 from sqlalchemy.orm import (
     relationship,
     Mapped,
@@ -27,7 +28,7 @@ from sqlalchemy import (
 
 class Base(DeclarativeBase):
     """Configuring the SQL Alchemy base class."""
-    metadata = MetaData(schema="dev")
+    metadata = MetaData(schema=parameter["schema_db"])
 
 
 departement_permissions = Table(

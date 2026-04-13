@@ -1,5 +1,5 @@
-# from sources.ress.setup_db import init_db
 import click
+from sources.cmd.db_cmd import create_table
 from sources.cmd.department_cmd import add_department
 from sources.cmd.user_cmd import (
     login,
@@ -31,9 +31,6 @@ from sources.ress.authorisation import read_user_from_token
 from sources.ress.view import View
 
 
-# init_db()
-
-
 @click.group()
 def cli():
     """Create the CLI command group"""
@@ -44,6 +41,9 @@ def cli():
     View.display_parameter(read_user_from_token())
     View.display_separation_line()
 
+
+# Added db commands
+cli.add_command(create_table)
 
 # Added user commands
 cli.add_command(login)

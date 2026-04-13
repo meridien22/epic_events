@@ -1,4 +1,3 @@
-from sources.dao.base_dao import SessionLocal
 from sources.dao import DAO
 from sources.ress.exceptions import NotFoundError
 from sources.ress.context_manager import view_scope, transaction_scope
@@ -101,7 +100,7 @@ class BaseCTR:
         Provides a dictionary with the model identifier as the key
         and the informal representation of the object as the value.
         """
-        with SessionLocal() as session:
+        with view_scope() as session:
             dao = DAO(session)
             target_dao = getattr(dao, self.dao_name)
             records = target_dao.get_all()

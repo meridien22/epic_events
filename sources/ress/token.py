@@ -1,4 +1,4 @@
-from sources.dao.base_dao import SessionLocal
+from sources.ress.session import SessionLocal
 from sources.dao import DAO
 from sources.ress.exceptions import AuthError, DatabaseError, FileError
 from datetime import datetime, timedelta, timezone
