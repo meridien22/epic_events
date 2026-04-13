@@ -4,7 +4,6 @@ from sources.ress.models import Department, Permission, User, Enterprise, Client
 from sources.ress.session import SessionLocal
 from private.parameter import parameter
 from sqlalchemy import select, text
-from sources.ress.view import View
 
 
 def init_db():
@@ -26,9 +25,8 @@ def init_db():
             "session"
         ]
         for table in tables:
-            View.log(message=table)
+            print(f"CREATE TABLE {table}")
             session.execute(text(f"TRUNCATE TABLE dev.{table} RESTART IDENTITY CASCADE;"))
-        View.log(exit=True)
         # Ajout des départements
         departments = ['Sales', 'Support', 'Management', 'Admin']
         for department in departments:
@@ -233,3 +231,5 @@ def init_db():
             session.add(event)
 
         session.commit()
+
+init_db()
