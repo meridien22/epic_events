@@ -70,10 +70,10 @@ def update_contract(contract_id):
                     "1": True,
                     "0": False,
                 }
+                choice = View.display_prompt_choices("Etat signature", values_user)
                 if values_db[choice]:
                     message = f"CONTRACT SIGNED : Nouveau contrat signé ({contract_id})"
                     sentry_sdk.capture_message(message, level="info")
-                choice = View.display_prompt_choices("Etat signature", values_user)
                 new_value = values_db[choice]
             case 'client_id':
                 clients = ctr.client.get_clients_for_current_commercial()

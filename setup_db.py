@@ -215,7 +215,7 @@ def init_db():
         query = select(Location.id).where(Location.city == "Franceville")
         location_id = session.execute(query).scalar()
         events = [
-            ["Anniversaire de Gégé", "Partie", 2500, contract_id, user_id, location_id, "2026-06-21", "2026-06-22"],
+            ["Fête de la musique", "Partie", 25000, contract_id, user_id, location_id, "2026-06-21", "2026-06-22"],
         ]
         for event_param in events:
             event = Event(

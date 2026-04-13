@@ -50,7 +50,7 @@ Vous devez adapter le paramètre **sentry_dns** en fonction de votre compte Sent
 
 7. **Initilaiser la base de données avec cette commande :**
     * `python setup_db.py`
-8. Consulter l'ensemble des commandes proposés par le programme :*
+8. Consulter l'ensemble des commandes proposées par le programme :*
     * `python epicevents.py`
 
 ![Texte alternatif](media/list_command.png)

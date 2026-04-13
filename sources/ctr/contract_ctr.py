@@ -38,17 +38,17 @@ class ContractCTR(BaseCTR):
             headers . append("Commercial")
         return headers, table_data
 
-    def add(self, client_id, remaining_amount):
+    def add(self, client_id, total_amount):
         """Opens a session to add a new contract."""
-        self.validate_attribute("remaining_amount", remaining_amount)
+        self.validate_attribute("total_amount", total_amount)
         with transaction_scope() as session:
             dao = DAO(session)
             from sources.ctr import ctr
             ctr.client.exists(client_id)
             dao.contract.create(
                 client_id=client_id,
-                remaining_amount=remaining_amount,
-                total_amount=0,
+                total_amount=total_amount,
+                remaining_amount=total_amount,
             )
 
     def get_signature_status(self, contract):

@@ -25,7 +25,7 @@ class EventCTR(BaseCTR):
             list.append(event.note)
             list.append(event.contract_id)
             if event.support is not None:
-                list.append("{event.support.first_name} {event.support.last_name}")
+                list.append(f"{event.support.first_name} {event.support.last_name}")
             else:
                 list.append("Aucun support")
             street = event.location.street

@@ -31,11 +31,11 @@ def read_user_from_token():
         current_session.access_token = config("EPIC_EVENTS_ACCESS_TOKEN", default=None)
         current_session.refresh_token = config("EPIC_EVENTS_REFRESH_TOKEN", default=None)
         if not current_session.access_token or not current_session.refresh_token:
-            return 'Aucun utilisateur connecté'
+            return 'Aucun utilisateur connecté. Veuillez vous connecter (login).'
         try:
             token.is_valid_access_refresh()
         except Exception:
-            return 'Aucun utilisateur connecté'
+            return 'Aucun utilisateur connecté. Veuillez vous connecter (login).'
         # si le token est valide, on récupère le user
         payload = token.get_payload(current_session.access_token)
         dao = DAO(session)
