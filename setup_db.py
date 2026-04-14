@@ -22,7 +22,6 @@ def init_db():
             "location",
             "departement_permission",
             "permission",
-            "session"
         ]
         for table in tables:
             print(f"CREATE TABLE {table}")

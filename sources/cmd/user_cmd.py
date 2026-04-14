@@ -39,7 +39,7 @@ def add_user(first_name, last_name, email, password):
         choices = ctr.department.get_dict_for_choices()
         department_id = View.display_prompt_choices("Départements disponibles", choices)
         ctr.user.add(first_name, last_name, email, password, department_id)
-        message = f"USER CREATE : Nouvel utilisateur {first_name} {last_name} {email} créé"
+        message = f"USER CREATE : Nouvel utilisateur {first_name} {last_name} créé"
         sentry_sdk.capture_message(message, level="info")
         View.display_success(f"Utilisateur {first_name}  {last_name} créé.")
 
